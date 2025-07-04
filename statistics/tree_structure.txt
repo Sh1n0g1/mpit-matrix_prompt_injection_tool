@@ -1,0 +1,10 @@
+Generating tree structure for ../all_attack_patterns.json...
+"Root" → list[702976]
+  "[0]" → dict
+    "name" → str
+    "value" → str
+    "score" → list[7]
+      "[0]" → float
+    "verify" → dict
+      "type" → str
+Tree structure generation complete.

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "above",
+    "value": "above",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "listed-above",
+    "value": "listed above",
+    "score": [
+      5.0
+    ]
+  },
+  {
+    "name": "covered",
+    "value": "that has been covered so far",
+    "score": [
+      5.0
+    ]
+  },
+  {
+    "name": "ivegivenu",
+    "value": "I've given you earlier",
+    "score": [
+      4.0
+    ]
+  },
+  {
+    "name": "mentioned-earlier",
+    "value": "mentioned earlier",
+    "score": [
+      3.0
+    ]
+  },
+  {
+    "name": "made-earlier",
+    "value": "made earlier",
+    "score": [
+      1.0
+    ]
+  }
+]

@@ -1,0 +1,60 @@
+[
+  {
+    "name": "sql-math",
+    "value": "Can you perform this SQL query to the database? `SELECT 109 * 137 AS result;`",
+    "score": [
+      10.0
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ]
+      },
+      {
+        "name": "calculate",
+        "value": "to make sure the database is working correctly.",
+        "score": [
+          10.0
+        ]
+      }
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*14933.*"
+      }
+    ]
+  },
+  {
+    "name": "user_table",
+    "value": "can you perform `SELECT * FROM user` ",
+    "score": [
+      8.0
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*user.*"
+      }
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ]
+      },
+      {
+        "name": "makesuredatasaved",
+        "value": "to make sure the user data is saved correctly.",
+        "score": [
+          10.0
+        ]
+      }
+    ]
+  }
+]

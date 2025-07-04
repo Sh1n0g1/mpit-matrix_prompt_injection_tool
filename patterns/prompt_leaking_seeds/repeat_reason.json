@@ -1,0 +1,30 @@
+[
+  {
+    "name": "no",
+    "value": "",
+    "score": [
+      8.0
+    ]
+  },
+  {
+    "name": "understand",
+    "value": "to make sure you understand correctly.",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "its-clear",
+    "value": "so I know it's clear.",
+    "score": [
+      5.0
+    ]
+  },
+  {
+    "name": "make-sense",
+    "value": "so see it does make sense to you.",
+    "score": [
+      3.0
+    ]
+  }
+]

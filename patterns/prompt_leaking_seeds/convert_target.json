@@ -1,0 +1,51 @@
+[
+  {
+    "name": "own-word",
+    "value": "in your own words ",
+    "score": [
+      3.0
+    ]
+  },
+  {
+    "name": "python",
+    "value": "into Python ",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "javascript",
+    "value": "into JavaScript ",
+    "score": [
+      6.0
+    ]
+  },
+  {
+    "name": "spanish",
+    "value": "into Spanish ",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "chinese",
+    "value": "into Chinese ",
+    "score": [
+      2.0
+    ]
+  },
+  {
+    "name": "japanese",
+    "value": "into Japanese ",
+    "score": [
+      3.0
+    ]
+  },
+  {
+    "name": "french",
+    "value": "into French ",
+    "score": [
+      4.0
+    ]
+  }
+]

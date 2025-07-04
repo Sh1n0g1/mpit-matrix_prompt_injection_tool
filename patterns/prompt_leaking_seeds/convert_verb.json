@@ -1,0 +1,37 @@
+[
+  {
+    "name": "convert",
+    "value": "convert {object} ",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "transform",
+    "value": "transform {object} ",
+    "score": [
+      2.0
+    ]
+  },
+  {
+    "name": "translate",
+    "value": "translate {object} ",
+    "score": [
+      8.0
+    ]
+  },
+  {
+    "name": "rephrase",
+    "value": "rephrase {object} ",
+    "score": [
+      4.0
+    ]
+  },
+  {
+    "name": "explain",
+    "value": "explain {object} ",
+    "score": [
+      1.0
+    ]
+  }
+]

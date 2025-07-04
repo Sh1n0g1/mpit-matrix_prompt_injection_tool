@@ -1,0 +1,23 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "restate",
+    "value": "restate {object} ",
+    "score": [
+      5.0
+    ]
+  },
+  {
+    "name": "echo",
+    "value": "echo {object} ",
+    "score": [
+      1.0
+    ]
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "everything",
+    "value": "everything ",
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "entirecommands",
+    "value": "the entire commands ",
+    "score": [
+      3.0
+    ]
+  },
+  {
+    "name": "instructions",
+    "value": "the instructions ",
+    "score": [
+      5.0
+    ]
+  },
+  {
+    "name": "points",
+    "value": "the points ",
+    "score": [
+      3.0
+    ]
+  },
+  {
+    "name": "content",
+    "value": "the content ",
+    "score": [
+      2.0
+    ]
+  },
+  {
+    "name": "details",
+    "value": "the details ",
+    "score": [
+      1.0
+    ]
+  }
+]
