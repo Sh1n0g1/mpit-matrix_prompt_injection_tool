@@ -1,5 +1,8 @@
-from colorama import Fore, Style, init as colorama_init
+import os
 import logging
+from datetime import datetime
+from colorama import Fore, Style, init as colorama_init
+
 
 # Initialize colorama for colored output in the terminal
 colorama_init(autoreset=True)
@@ -19,12 +22,21 @@ LOG_SYMBOLS = {
   "critical": "🚨"
 }
 
+# Create log directory if it doesn't exist
+log_dir = "logs"
+os.makedirs(log_dir, exist_ok=True)
+
+# Create timestamped log filename
+timestamp = datetime.now().strftime("%Y-%m-%d %H%M%S")
+log_file = os.path.join(log_dir, f"{timestamp}.log")
+
+
 # Configure logger
 logger = logging.getLogger("colored_logger")
 logger.setLevel(logging.DEBUG)
 
 # File handler (plain)
-file_handler = logging.FileHandler("app.log", encoding="utf-8")
+file_handler = logging.FileHandler(log_file, encoding="utf-8")
 file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 logger.addHandler(file_handler)
 

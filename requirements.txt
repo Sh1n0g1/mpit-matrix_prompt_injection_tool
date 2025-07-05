@@ -1,2 +1,4 @@
 colorama
 rich
+openai
+requests

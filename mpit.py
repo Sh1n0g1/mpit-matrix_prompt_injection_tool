@@ -2,6 +2,7 @@ import csv
 import sys
 import json
 import argparse
+from datetime import datetime
 from rich.progress import Progress
 from rich.console import Console
 from rich.table import Table
@@ -57,7 +58,6 @@ def combine_patterns(pattern_seeds: dict) -> dict:
     len(pattern_seeds["exploit"]) *
     len(pattern_seeds["new_instruction"]) 
   )
-  printl("New instruction patterns count: " + str(len(pattern_seeds["new_instruction"])), "info")
   printl(f"Total combinations to generate: {total}", "info")
   attack_patterns =[]
 
@@ -107,7 +107,35 @@ def filter_patterns(attack_patterns: list, filter_criteria: dict) -> list:
 
   return filtered
 
-def get_statistics(patterns: list) -> dict:
+
+def save_filtered_patterns_to_csv(filtered_patterns, output_file="filtered_patterns.csv"):
+  """
+  Save selected fields from filtered patterns to a CSV file.
+
+  Parameters:
+    filtered_patterns (list): List of pattern dicts.
+    output_file (str): Output file name (default: "filtered_patterns.csv")
+  """
+  try:
+    with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
+      writer = csv.writer(csvfile)
+      writer.writerow(["name", "pattern", "score_average", "type"])
+
+      for pattern in filtered_patterns:
+        name = pattern.get("name", "")
+        value = pattern.get("value", "")
+        scores = pattern.get("score", [])
+        average_score = round(sum(scores) / len(scores), 2) if scores else 0
+        ptype = pattern.get("type", "")
+
+        writer.writerow([name, value, average_score, ptype])
+    return True
+  except Exception as e:
+    printl(f"Error saving to CSV: {e}", "error")
+    return False
+
+
+def get_attack_pattern_statistics(patterns: list) -> dict:
   """
   Generate and display statistics of pattern types using Rich.
 
@@ -136,56 +164,35 @@ def get_statistics(patterns: list) -> dict:
 
   return dict(stats)
 
-def save_filtered_patterns_to_csv(filtered_patterns, output_file="filtered_patterns.csv"):
-  """
-  Save selected fields from filtered patterns to a CSV file.
-
-  Parameters:
-    filtered_patterns (list): List of pattern dicts.
-    output_file (str): Output file name (default: "filtered_patterns.csv")
-  """
-  with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
-    writer = csv.writer(csvfile)
-    writer.writerow(["name", "pattern", "score_average", "type"])
-
-    for pattern in filtered_patterns:
-      name = pattern.get("name", "")
-      value = pattern.get("value", "")
-      scores = pattern.get("score", [])
-      average_score = round(sum(scores) / len(scores), 2) if scores else 0
-      ptype = pattern.get("type", "")
-
-      writer.writerow([name, value, average_score, ptype])
-
 def parse_args():
   parser = argparse.ArgumentParser(
-    description="The Matrix Prompt Injection Tool (MPIT) - Generate, Apply, or Simulate prompt injection attacks.",
+    description="The Matrix Prompt Injection Tool (MPIT) - Generate, Attack, or Simulate prompt injection attacks.",
     epilog="""
     Examples:
-      G Mode (Generate): python mpit.py G 
-      A Mode (Apply):    python mpit.py A --url https://example.com --real-victim-curl-file victim.curl
+      G Mode (Generate): python mpit.py G --score-filter 8.0 --no-rce
+      A Mode (Attack):   python mpit.py A --url https://example.com --real-victim-curl-file victim.curl
                                           --attempt-per-attack 2 --no-sqli --score-filter 8.0
-      S Mode (Simulate): python mpit.py S --system-prompt-file prompt.txt --temperature 0.7
+      S Mode (Simulate): python mpit.py S --system-prompt-file sample_input/systemprompt.txt --temperature 0.7
                                           --no-rce --no-mdi --score-filter 9.0
     """,
     formatter_class=argparse.RawTextHelpFormatter
   )
 
-  # Mode selection: G = Generate, A = Apply, S = Simulate
-  parser.add_argument("mode", choices=["G", "A", "S"], help="Mode: G (Generate), A (Apply), S (Simulate)")
+  # Mode selection: G = Generate, A = Attack, S = Simulate
+  parser.add_argument("mode", choices=["G", "A", "S"], help="Mode: G (Generate), A (Attack), S (Simulate)")
 
-  # Apply mode parameters
-  parser.add_argument("--url", type=str, help="A:Target base URL for Apply mode.")
+  # Attack mode parameters
+  parser.add_argument("--url", type=str, help="A:Target base URL for Attack mode.")
   parser.add_argument("--real-victim-curl-file", type=str, help="A:File path containing real victim curl command.")
 
   # Simulate mode parameters
   parser.add_argument("--system-prompt-file", type=str, help="S:File path containing simulated victim system prompt.")
   parser.add_argument("--temperature", type=float, default=0.4, help="S:Temperature for simulated LLM (0.0 - 1.0)")
 
+  # Attack and Simulate mode common parameters
   parser.add_argument("--attempt-per-attack", type=int, default=1, help="AS: Number of attempts per attack (default: 1)")
 
   # Common options for all modes
-  
   parser.add_argument("--no-mdi", action="store_true", default=False, help="Disable MDI test (default: False).")
   parser.add_argument("--no-prompt-leaking", action="store_true", default=False, help="Disable prompt leaking test (default: False).")
   parser.add_argument("--no-freellm", action="store_true", default=False, help="Disable FreeLLM test (default: False).")
@@ -204,13 +211,16 @@ def parse_args():
   # Mode-specific validations
   if args.mode == "A":
     if not args.url or not args.real_victim_curl_file:
-      parser.error("Mode 'A' requires --url and --real_victim_curl_file.")
+      printl("Mode 'A' requires --url and --real_victim_curl_file.", "error")
+      exit(1)
 
   elif args.mode == "S":
     if not args.system_prompt_file:
-      parser.error("Mode 'S' requires --system_prompt_file.")
+      printl("Mode 'S' requires --system_prompt_file.", "error")
+      exit(1)
     if not (0.0 <= args.temperature <= 1.0):
-      parser.error("Temperature must be between 0.0 and 1.0.")
+      printl("Temperature must be between 0.0 and 1.0.", "error")
+      exit(1)
 
   return args
 
@@ -246,11 +256,15 @@ if __name__ == "__main__":
 
   filtered_patterns = filter_patterns(attack_patterns, filter_criteria)
   printl(f"Filtered attack patterns with average score >= {args.score_filter}: {len(filtered_patterns)}", "info")
-  statistics = get_statistics(filtered_patterns)
+  statistics = get_attack_pattern_statistics(filtered_patterns)
   with open("filtered_attack_patterns.json", 'w', encoding='utf-8') as file:
     json.dump(filtered_patterns, file, indent=2, ensure_ascii=False)
   printl("Filtered attack patterns saved to 'filtered_attack_patterns.json'.", "info")
-  save_filtered_patterns_to_csv(filtered_patterns, "filtered_attack_patterns.csv")
+  save_result=save_filtered_patterns_to_csv(filtered_patterns, "filtered_attack_patterns.csv")
+  if not save_result:
+    printl("Failed to save filtered patterns to CSV.", "error")
+    exit(1)
   printl("Filtered attack patterns saved to 'filtered_attack_patterns.csv'.", "info")
 
-
+  if args.mode == "S":
+    pass
