@@ -124,7 +124,7 @@ def save_filtered_patterns_to_csv(filtered_patterns, output_file="filtered_patte
     output_file (str): Output file name (default: "filtered_patterns.csv")
   """
   try:
-    with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
+    with open(output_file, "w", newline="", encoding="utf-8-sig") as csvfile:
       writer = csv.writer(csvfile)
       writer.writerow(["name", "pattern", "score_average", "type"])
 
@@ -150,7 +150,7 @@ def save_mpit_results_to_csv(mpit_results, output_file="mpit_results.csv"):
     output_file (str): Output file name (default: "mpit_results.csv")
   """
   try:
-    with open(output_file, "w", newline="", encoding="utf-8") as csvfile:
+    with open(output_file, "w", newline="", encoding="utf-8-sig") as csvfile:
       writer = csv.writer(csvfile)
       writer.writerow(["type", "name", "value", "responses", "attack_success", "average_score", "score"])
 
@@ -259,6 +259,9 @@ def parse_args():
   parser.add_argument("--no-xss", action="store_true", default=False, help="Disable XSS test (default: False).")
   parser.add_argument("--no-rce", action="store_true", default=False, help="Disable RCE test (default: False).")
   parser.add_argument("--no-sqli", action="store_true", default=False, help="Disable SQLi test (default: False).")
+  
+  # Experimental options
+  parser.add_argument("--dump-all-attack", action="store_true", default=False, help="Dump all attack patterns to a file (default: False).")
 
   parser.add_argument("--score-filter", type=float, default=10, help="Minimum score threshold to filter attack patterns (default: 9.0).")
   # Show help if no arguments are provided
@@ -337,6 +340,13 @@ if __name__ == "__main__":
   pattern_seeds = load_pattern_files()
   attack_patterns = combine_patterns(pattern_seeds)
   printl(f"Total attack patterns generated: {len(attack_patterns)}", "info")
+  
+  if args.dump_all_attack:
+    all_patterns_path ="all_attack_patterns.json"
+    with open(all_patterns_path, 'w', encoding='utf-8') as file:
+      json.dump(attack_patterns, file, indent=2, ensure_ascii=False)
+    printl(f"{all_patterns_path} saved.", "info")
+  
   
   filter_type=[]
   if not args.no_osr:
@@ -427,14 +437,14 @@ if __name__ == "__main__":
   mpit_results_path = os.path.join(report_dir, "mpit_results.json")
   with open(mpit_results_path, 'w', encoding='utf-8') as file:
     json.dump(mpit_results, file, indent=2, ensure_ascii=False)
-  printl(f"MPIT results saved to {mpit_results_path}", "info")
+  printl(f"{mpit_results_path} saved", "info")
   save_result = save_mpit_results_to_csv(mpit_results, mpit_results_path.replace(".json", ".csv"))
   if not save_result:
     printl("Failed to save MPIT results to CSV.", "error")
     exit(1)
-  printl(f"MPIT results saved to {mpit_results_path.replace('.json', '.csv')}", "info")
+  printl(f"{mpit_results_path.replace('.json', '.csv')} saved.", "info")
   # Generate HTML report
   html_report_path = os.path.join(report_dir, "attack_report.html")
   generate_html_report(mpit_results, attack_period_start, attack_period_end, html_report_path)
-  printl(f"HTML report generated at {html_report_path}", "info")
+  printl(f"{html_report_path} saved.", "info")
   webbrowser.open(html_report_path)

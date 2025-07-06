@@ -1,14 +1,11 @@
 ## Executive Summary
 
-The security assessment reveals a mixed landscape of vulnerabilities within the system. Notably, **FreeLLM (low severity)** and **Markdown Injection (medium severity)** attacks were entirely successful, indicating critical weaknesses that could allow attackers to utilize the language model for unintended tasks and leak data through rendered Markdown content. 
-
-**Prompt Leaking (medium severity)** and **Cross-Site Scripting (high severity)** attacks demonstrated partial success rates of approximately 41.7% and 33.3%, respectively, highlighting inconsistent defenses against prompt injection and script execution threats. 
-
-Conversely, **SQL Injection (high severity)** and **Remote Code Execution (critical severity)** attacks were entirely unsuccessful, suggesting effective mitigation measures are in place for these high-impact vulnerabilities.
+The security assessment reveals a varied landscape of vulnerabilities within the system. Notably, **Out-of-Score Request (OSR)** vulnerabilities are fully exploitable, with all attempts succeeding, indicating a significant risk of out-of-scope task execution. **Markdown Injection (MDI)** vulnerabilities are highly prevalent, with a success rate of over 90%, posing a substantial threat of data leakage through rendered content. **Cross-Site Scripting (XSS)** attacks show a moderate success rate of approximately 45%, highlighting potential for malicious script execution within the environment. Conversely, **SQL Injection (SQLi)** and **Remote Code Execution (RCE)** vulnerabilities were not successfully exploited during testing, suggesting these vectors are currently well mitigated. The high success rate of OSR and MDI attacks underscores the need for immediate security enhancements.
 
 ## Recommendations
 
-- Prioritize addressing the vulnerabilities associated with **FreeLLM** and **Markdown Injection** to prevent misuse and data leaks.
-- Enhance defenses against **Prompt Leaking** and **Cross-Site Scripting** by implementing stricter input validation and output sanitization.
-- Continue monitoring and testing for **SQL Injection** and **Remote Code Execution** to maintain their mitigation status.
-- Regularly update security protocols and conduct penetration testing to identify and remediate emerging threats.
+- Implement strict input validation and sanitization to prevent OSR and MDI exploits.
+- Enhance output encoding and content security policies to mitigate XSS risks.
+- Conduct regular security audits and penetration testing to identify and address emerging vulnerabilities.
+- Limit the permissions and capabilities of the LLM environment to reduce the impact of successful attacks.
+- Monitor system logs for unusual activity indicative of attempted or successful exploits.

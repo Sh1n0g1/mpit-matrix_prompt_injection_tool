@@ -65,6 +65,27 @@
           padding: 5mm;
         }
       }
+
+      .target-summary-container {
+        display: flex;
+        gap: 20px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 30px;
+      }
+
+      .target-box,
+      .summary-box {
+        flex: 1 1 48%;
+        min-width: 300px;
+      }
+
+      .attack-info div {
+        margin-bottom: 6px;
+        color: #e0e0e0;
+        font-size: 14px;
+      }
+
       .type-osr {
         color: #3498db;
         font-weight: bold;
@@ -111,14 +132,22 @@
       <img src="../../images/mpit_logo.png" alt="MPIT Logo" style="height: 60px;">
       <h1 style="margin: 0;">MPIT Attack Report</h1>
     </div>
-    <h2>Attack Evaluation Period</h2>
-    <table>
-      <tr>
-        <td><strong>Start:</strong> {{ attack_start }}</td>
-        <td><strong>End:</strong> {{ attack_end }}</td>
-        <td><strong>Duration:</strong> {{ attack_duration }}</td>
-      </tr>
-    </table>
+    <h2>Scope</h2>
+    <div class="target-summary-container">
+      <div class="target-box">
+        {{ target_scope | safe }}
+      </div>
+      <div class="summary-box">
+        <h3>Attack Period</h3>
+        <div class="attack-info">
+          <div><strong>Start:</strong> {{ attack_start }}</div>
+          <div><strong>End:</strong> {{ attack_end }}</div>
+          <div><strong>Duration:</strong> {{ attack_duration }}</div>
+          <div><strong>Attacks:</strong> {{ total_attempts }}</div>
+          <div><strong>Avg. Time per Attack:</strong> {{ second_per_attack | round(2) }} seconds</div>
+        </div>
+      </div>
+    </div>
     <p>{{ executive_summary | safe }}</p>
     <h2>Summary Table</h2>
     <table id="summary-table">
@@ -188,7 +217,7 @@
   </table>
   <div class="page-break"></div>
   <h1>Appendix</h1>
-  <h2>Vulnerabilitiy Definitions</h2>
+  <h2>Vulnerability Definitions</h2>
   
   <div class="vuln">
     <h3 class="type-rce">Remote Code Execution (RCE) - Critical</h3>

@@ -1,0 +1,18 @@
+{
+  "commandline": "python mpit.py S --system-prompt-file samples/systemprompt.txt --prompt-leaking-keywords SunsetVoyager#3971 --attempt-per-attack 1 --temperature 1 --score-filter 8",
+  "mode": "S",
+  "target_url": null,
+  "target_curl_file": null,
+  "system_prompt_file": "samples/systemprompt.txt",
+  "temperature": 1.0,
+  "attempt_per_attack": 1,
+  "prompt_leaking_keywords": "SunsetVoyager#3971",
+  "no_mdi": false,
+  "no_prompt_leaking": false,
+  "no_osr": false,
+  "no_xss": false,
+  "no_rce": false,
+  "no_sqli": false,
+  "score_filter": 8.0,
+  "log_file": "logs\\2025-07-06 231701.log"
+}

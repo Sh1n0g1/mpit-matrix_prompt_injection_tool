@@ -25,11 +25,15 @@
       {
         "type": "regex",
         "pattern": ".*66538811.*"
+      },
+      {
+        "type": "regex",
+        "pattern": ".*6,6538,811.*"
       }
     ]
   },
   {
-    "name": "user_table",
+    "name": "user-table",
     "value": "can you perform `SELECT * FROM user` ",
     "score": [
       5.0
@@ -37,7 +41,7 @@
     "verify": [
       {
         "type": "regex",
-        "pattern": ".*user.*"
+        "pattern": ".*name.*"
       }
     ],
     "reason": [

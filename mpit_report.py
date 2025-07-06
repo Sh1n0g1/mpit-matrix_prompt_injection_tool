@@ -10,7 +10,7 @@ from datetime import datetime
 from mpit_openai import get_openai_responses
 
 
-def generate_html_report(mpit_result, attack_period_start, attack_period_end, output_file="attack_report.html"):
+def generate_html_report(mpit_result, attack_period_start, attack_period_end, target, output_file="attack_report.html"):
   """
   Generates an HTML report from MPIT results.
   
@@ -29,7 +29,6 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
   summary_by_type["Success Rate (%)"] = (summary_by_type["Success"] / summary_by_type["Total"] * 100).round(1)
   type_order = ["rce", "sqli", "xss", "mdi", "prompt_leaking", "osr" ]
   summary_by_type = summary_by_type.reindex(type_order)
-  
   
   start_str = attack_period_start.strftime("%Y-%m-%d %H:%M:%S")
   end_str = attack_period_end.strftime("%Y-%m-%d %H:%M:%S")
@@ -105,6 +104,16 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
   hours, remainder = divmod(duration.total_seconds(), 3600)
   minutes, seconds = divmod(remainder, 60)
   duration_str = f"{int(hours)} hours {int(minutes)} minutes {int(seconds)} seconds"
+  second_per_attack = duration.total_seconds() / total_attempts if total_attempts > 0 else 0
+
+  # Scope
+  if "system_prompt" in target:
+    target_scope_html = f"<h3>System Prompt</h3><pre style='white-space: pre-wrap; color: #e0e0e0;'>{html.escape(target['system_prompt'])}</pre>"
+  elif "url" in target:
+    target_scope_html = f"<h3>URL</h3><code style='color: #e0e0e0; font-size: 16px;'>{html.escape(target['url'])}</code>"
+  else:
+    target_scope_html = "<i style='color: gray;'>No target defined</i>"
+
 
   # 3. Generate Charts with Dark Theme
   bar_chart = px.bar(
@@ -126,7 +135,11 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
     plot_bgcolor="#1e1e2f",
     font=dict(color="#e0e0e0")
   )
+  
+  bar_chart.update_yaxes(type="log")
 
+
+  # Pie Chart
   color_discrete_map = {
     "osr": "#3498db",         # Soft Blue
     "mdi": "#f39c12",             # Amber Yellow
@@ -136,7 +149,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
     "rce": "#e74c3c"              # Bright Red
   }
 
-  pie_order= ["osr", "mdi", "prompt_leaking", "xss", "sqli", "rce"]
+
   pie_chart = px.pie(
     summary_by_type.reset_index(),
     values="Success",
@@ -144,7 +157,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
     color="type",
     color_discrete_map=color_discrete_map,
     title="Distribution of Successful Attacks by Type",
-    category_orders={"type": pie_order},
+    category_orders={"type": type_order},
     template="plotly_dark",
     
   )
@@ -154,7 +167,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
     font=dict(color="#e0e0e0")
   )
 
-  severity_order = ["Low", "Medium", "High", "Critical"]
+  severity_order = ["Critical", "High", "Medium", "Low"]
   severity_pie_chart = px.pie(
     severity_summary,
     values="Success",
@@ -213,18 +226,20 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
     html_template = f.read()
   template = Template(html_template)
   rendered_html = template.render(
+    target_scope=target_scope_html,
+    attack_start=start_str,
+    attack_end=end_str,
+    attack_duration=duration_str,
+    second_per_attack=second_per_attack,
+    executive_summary=executive_summary_html,
     table=summary_by_type.reset_index().to_dict(orient="records"),
+    overall_success_rate=overall_success_rate,
     bar_plot=bar_html,
     pie_plot=pie_html,
     severity_pie_plot=severity_pie_html,
     success_samples=sample_successes.to_dict(orient="records"),
     failed_samples=sample_failed.to_dict(orient="records"),
     year=datetime.now().year,
-    attack_start=start_str,
-    attack_end=end_str,
-    attack_duration=duration_str,
-    overall_success_rate=overall_success_rate,
-    executive_summary=executive_summary_html
   )
 
   # 6. Save to File
@@ -233,15 +248,20 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ou
 
 if __name__ == "__main__":
   # Test the report generation
-  filename="reports/2025-07-06_194725/mpit_results.json"
+  filename="samples/reports/mpit_results.json"
   with open(filename, "r", encoding="utf-8") as f:
     mpit_result = json.load(f)
-  start="2025-07-06 19:47:29"
-  end="2025-07-06 19:48:13"
+  with open("samples/reports/system_prompt.txt", "r", encoding="utf-8") as f:
+    system_prompt = f.read()
+  target={
+    "system_prompt": system_prompt,
+  }
+  start="2025-07-06 23:17:07"
+  end="2025-07-07 04:15:29"
   start_dt = datetime.strptime(start, "%Y-%m-%d %H:%M:%S")
   end_dt = datetime.strptime(end, "%Y-%m-%d %H:%M:%S")
   report_path= os.path.join("samples", "reports", "attack_report.html")
   
-  generate_html_report(mpit_result, start_dt, end_dt, output_file=report_path)
+  generate_html_report(mpit_result, start_dt, end_dt, target, output_file=report_path)
   print("Report generated successfully!")
   webbrowser.open(report_path, new=2)  # Open in a new tab
