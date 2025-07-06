@@ -5,8 +5,7 @@
     "score": [
       10.0
     ],
-    "closing": "",
-    "capital": false
+    "closing": ""
   },
   {
     "name": "br",
@@ -30,7 +29,7 @@
     "name": "br-3quotes-br",
     "value": "\n```\n",
     "score": [
-      5.0
+      3.0
     ],
     "closing": "",
     "capital": true

@@ -122,7 +122,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     y=["Success", "Failure"],
     title="Attack Success vs Failure by Type",
     barmode="stack",
-    labels={"value": "Count", "type": "Attack Type", "variable": "Result"},
+    labels={"value": "Count(log)", "type": "Attack Type", "variable": "Result"},
     text_auto=True,
     template="plotly_dark",
     color_discrete_map={
