@@ -1,4 +1,5 @@
 import os
+import sys
 import logging
 from datetime import datetime
 from colorama import Fore, Style, init as colorama_init
@@ -72,3 +73,5 @@ def printl(message: str, errorlevel: str = "info", e:Exception = None) -> None:
     logger.critical(full_message)
   else:
     logger.info(full_message)
+
+printl(f"Command line: {' '.join(sys.argv)}", "debug")

@@ -9,6 +9,15 @@ pip install -r requirements.txt
 
 ```
 ## How to use
+### TLDR
+1. Prepare your system prompt, e.g.) system_prompt.txt
+2. Run this command
+`python mpit.py S --system-prompt-file system_prompt.txt --prompt-leaking-keywords "SunsetVoyager#3971" --attempt-per-attack 1 --temperature 1 --score-filter 10
+3. You will get a nice HTML report (can be print in PDF by the browser)
+4. All data will be under the reports directory
+5. This is "[S]imulation mode"
+
+### Details
 * MIPT has 3 different modes:
   * [G]enerate Attack Pattern
   * [A]ttack the LLM App (URL required)
@@ -57,8 +66,9 @@ options:
 ```
 
 ### Preparation
+
 #### What attack can be skipped ?
-* Perform reconnaissance to understand how the LLM output is handled.
+* Perform observation to understand how the LLM output is handled.
   - Ask what tools or function-calling capabilities are available
     - API calls / MCP
     - Database (potential SQL injection vulnerability)
