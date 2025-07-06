@@ -363,12 +363,12 @@ if __name__ == "__main__":
   filtered_patterns_path = os.path.join(report_dir, "filtered_attack_patterns.json")
   with open(filtered_patterns_path, 'w', encoding='utf-8') as file:
     json.dump(filtered_patterns, file, indent=2, ensure_ascii=False)
-  printl(f"Filtered attack patterns saved to {filtered_patterns_path}.", "info")
+  printl(f"{filtered_patterns_path} saved.", "info")
   save_result=save_filtered_patterns_to_csv(filtered_patterns, filtered_patterns_path.replace(".json", ".csv"))
   if not save_result:
     printl("Failed to save filtered patterns to CSV.", "error")
     exit(1)
-  printl(f"Filtered attack patterns saved to {filtered_patterns_path.replace('.json', '.csv')}.", "info")
+  printl(f"{filtered_patterns_path.replace('.json', '.csv')} saved.", "info")
 
   if args.mode == "G":
     exit(0) 
