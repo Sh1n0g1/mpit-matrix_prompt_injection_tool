@@ -206,8 +206,15 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     .apply(lambda g: g[["value", "responses"]].head(3).assign(type=g.name), include_groups=False)
     .reset_index(drop=True)
   )
+  sample_successes["type"] = pd.Categorical(
+    sample_successes["type"],
+    categories=type_order,
+    ordered=True
+  )
+  sample_successes = sample_successes.sort_values("type")
   sample_successes["responses"] = sample_successes["responses"].apply(html.escape)
   sample_successes["value"] = sample_successes["value"].apply(html.escape)
+  
 
   # Collect a failed patterns per type
   sample_failed = (
@@ -216,6 +223,12 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     .apply(lambda g: g[["value", "responses"]].head(1).assign(type=g.name), include_groups=False)
     .reset_index(drop=True)
   )
+  sample_failed["type"] = pd.Categorical(
+    sample_failed["type"],
+    categories=type_order,
+    ordered=True
+  )
+  sample_failed = sample_failed.sort_values("type")
   sample_failed["responses"] = sample_failed["responses"].apply(html.escape)
   sample_failed["value"] = sample_failed["value"].apply(html.escape)
 
