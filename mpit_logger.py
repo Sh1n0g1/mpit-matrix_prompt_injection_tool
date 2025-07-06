@@ -56,7 +56,8 @@ def printl(message: str, errorlevel: str = "info", e:Exception = None) -> None:
     full_message += f" | Exception: {repr(e)}"
   full_message = f"{LOG_SYMBOLS.get(errorlevel, 'ℹ️')}  {full_message}"
   # Print with color
-  print(color + full_message + Style.RESET_ALL)
+  if errorlevel != "debug":
+    print(color + full_message + Style.RESET_ALL)
 
   # Log to file (with appropriate level)
   if errorlevel == "debug":

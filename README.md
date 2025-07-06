@@ -14,42 +14,46 @@ pip install -r requirements.txt
   * [A]ttack the LLM App (URL required)
   * [S]imulate the LLM App (system prompt required)
 ```
-usage: mpit.py [-h] [--url URL] [--real-victim-curl-file REAL_VICTIM_CURL_FILE] [--system-prompt-file SYSTEM_PROMPT_FILE] [--temperature TEMPERATURE]
-               [--attempt-per-attack ATTEMPT_PER_ATTACK] [--no-mdi] [--no-prompt-leaking] [--no-freellm] [--no-xss] [--no-rce] [--no-sqli]
-               [--score-filter SCORE_FILTER]
+usage: mpit.py [-h] [--target-url TARGET_URL] [--target-curl-file TARGET_CURL_FILE] [--system-prompt-file SYSTEM_PROMPT_FILE] [--temperature TEMPERATURE]
+               [--attempt-per-attack ATTEMPT_PER_ATTACK] [--prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS] [--no-mdi] [--no-prompt-leaking] [--no-osr] 
+               [--no-xss] [--no-rce] [--no-sqli] [--score-filter SCORE_FILTER]
                {G,A,S}
 
-The Matrix Prompt Injection Tool (MPIT) - Generate, Attack, or Simulate prompt injection attacks.
+The Matrix Prompt Injection Tool (MPIT) - Generate, Simulate or Attack prompt injection attacks.
 
 positional arguments:
   {G,A,S}               Mode: G (Generate), A (Attack), S (Simulate)
 
 options:
   -h, --help            show this help message and exit
-  --url URL             A:Target base URL for Attack mode.
-  --real-victim-curl-file REAL_VICTIM_CURL_FILE
-                        A:File path containing real victim request curl command.
+  --target-url TARGET_URL
+                        A:Target base URL for Attack mode.
+  --target-curl-file TARGET_CURL_FILE
+                        A:File path containing real victim curl command.
   --system-prompt-file SYSTEM_PROMPT_FILE
                         S:File path containing simulated victim system prompt.
   --temperature TEMPERATURE
                         S:Temperature for simulated LLM (0.0 - 1.0)
   --attempt-per-attack ATTEMPT_PER_ATTACK
                         AS: Number of attempts per attack (default: 1)
+  --prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS
+                        AS: A list of keywords to check for prompt leaking, separated by commas (default: empty).
   --no-mdi              Disable MDI test (default: False).
   --no-prompt-leaking   Disable prompt leaking test (default: False).
-  --no-freellm          Disable FreeLLM test (default: False).
+  --no-osr              Disable Out-of-scope request test (default: False).
   --no-xss              Disable XSS test (default: False).
   --no-rce              Disable RCE test (default: False).
   --no-sqli             Disable SQLi test (default: False).
   --score-filter SCORE_FILTER
                         Minimum score threshold to filter attack patterns (default: 9.0).
 
-  Examples:
-    G Mode (Generate): python mpit.py G --score-filter 8.0 --no-rce
-    A Mode (Attack):   python mpit.py A --url https://example.com --real-victim-curl-file victim.curl
-                                        --attempt-per-attack 2 --no-sqli --score-filter 8.0
-    S Mode (Simulate): python mpit.py S --system-prompt-file sample_input/systemprompt.txt --temperature 0.7
-                                        --no-rce --no-mdi --score-filter 9.0
+    Examples:
+      G Mode (Generate): python mpit.py G --score-filter 8.0 --no-rce
+      S Mode (Simulate): python mpit.py S python mpit.py S --system-prompt-file samples/systemprompt.txt
+                                          --prompt-leaking-keywords "SunsetVoyager#3971" --attempt-per-attack 1 --temperature 1 
+                                          --score-filter 10
+      A Mode (Attack):   python mpit.py A --target-url https://example.com --target-curl-file victim.curl
+                                          --attempt-per-attack 2 --no-sqli --score-filter 8.0
 ```
 
 ### Preparation
