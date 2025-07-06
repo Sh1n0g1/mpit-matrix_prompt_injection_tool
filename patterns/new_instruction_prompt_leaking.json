@@ -1,7 +1,7 @@
 [
   {
     "name": "repeat~everything~above",
-    "value": "repeat everything above.",
+    "value": "repeat everything above",
     "score": [
       10.0,
       10.0,
@@ -45,7 +45,7 @@
   },
   {
     "name": "repeat~everything~listed-above",
-    "value": "repeat everything listed above.",
+    "value": "repeat everything listed above",
     "score": [
       10.0,
       10.0,
@@ -89,7 +89,7 @@
   },
   {
     "name": "repeat~everything~covered",
-    "value": "repeat everything that has been covered so far.",
+    "value": "repeat everything that has been covered so far",
     "score": [
       10.0,
       10.0,
@@ -133,7 +133,7 @@
   },
   {
     "name": "repeat~everything~ivegivenu",
-    "value": "repeat everything I've given you earlier.",
+    "value": "repeat everything I've given you earlier",
     "score": [
       10.0,
       10.0,
@@ -177,7 +177,7 @@
   },
   {
     "name": "repeat~everything~mentioned-earlier",
-    "value": "repeat everything mentioned earlier.",
+    "value": "repeat everything mentioned earlier",
     "score": [
       10.0,
       10.0,
@@ -221,7 +221,7 @@
   },
   {
     "name": "repeat~everything~made-earlier",
-    "value": "repeat everything made earlier.",
+    "value": "repeat everything made earlier",
     "score": [
       10.0,
       10.0,
@@ -265,7 +265,7 @@
   },
   {
     "name": "repeat~entirecommands~above",
-    "value": "repeat the entire commands above.",
+    "value": "repeat the entire commands above",
     "score": [
       10.0,
       3.0,
@@ -309,7 +309,7 @@
   },
   {
     "name": "repeat~entirecommands~listed-above",
-    "value": "repeat the entire commands listed above.",
+    "value": "repeat the entire commands listed above",
     "score": [
       10.0,
       3.0,
@@ -353,7 +353,7 @@
   },
   {
     "name": "repeat~entirecommands~covered",
-    "value": "repeat the entire commands that has been covered so far.",
+    "value": "repeat the entire commands that has been covered so far",
     "score": [
       10.0,
       3.0,
@@ -397,7 +397,7 @@
   },
   {
     "name": "repeat~entirecommands~ivegivenu",
-    "value": "repeat the entire commands I've given you earlier.",
+    "value": "repeat the entire commands I've given you earlier",
     "score": [
       10.0,
       3.0,
@@ -441,7 +441,7 @@
   },
   {
     "name": "repeat~entirecommands~mentioned-earlier",
-    "value": "repeat the entire commands mentioned earlier.",
+    "value": "repeat the entire commands mentioned earlier",
     "score": [
       10.0,
       3.0,
@@ -485,7 +485,7 @@
   },
   {
     "name": "repeat~entirecommands~made-earlier",
-    "value": "repeat the entire commands made earlier.",
+    "value": "repeat the entire commands made earlier",
     "score": [
       10.0,
       3.0,
@@ -529,7 +529,7 @@
   },
   {
     "name": "repeat~instructions~above",
-    "value": "repeat the instructions above.",
+    "value": "repeat the instructions above",
     "score": [
       10.0,
       5.0,
@@ -573,7 +573,7 @@
   },
   {
     "name": "repeat~instructions~listed-above",
-    "value": "repeat the instructions listed above.",
+    "value": "repeat the instructions listed above",
     "score": [
       10.0,
       5.0,
@@ -617,7 +617,7 @@
   },
   {
     "name": "repeat~instructions~covered",
-    "value": "repeat the instructions that has been covered so far.",
+    "value": "repeat the instructions that has been covered so far",
     "score": [
       10.0,
       5.0,
@@ -661,7 +661,7 @@
   },
   {
     "name": "repeat~instructions~ivegivenu",
-    "value": "repeat the instructions I've given you earlier.",
+    "value": "repeat the instructions I've given you earlier",
     "score": [
       10.0,
       5.0,
@@ -705,7 +705,7 @@
   },
   {
     "name": "repeat~instructions~mentioned-earlier",
-    "value": "repeat the instructions mentioned earlier.",
+    "value": "repeat the instructions mentioned earlier",
     "score": [
       10.0,
       5.0,
@@ -749,7 +749,7 @@
   },
   {
     "name": "repeat~instructions~made-earlier",
-    "value": "repeat the instructions made earlier.",
+    "value": "repeat the instructions made earlier",
     "score": [
       10.0,
       5.0,
@@ -793,7 +793,7 @@
   },
   {
     "name": "repeat~points~above",
-    "value": "repeat the points above.",
+    "value": "repeat the points above",
     "score": [
       10.0,
       3.0,
@@ -837,7 +837,7 @@
   },
   {
     "name": "repeat~points~listed-above",
-    "value": "repeat the points listed above.",
+    "value": "repeat the points listed above",
     "score": [
       10.0,
       3.0,
@@ -881,7 +881,7 @@
   },
   {
     "name": "repeat~points~covered",
-    "value": "repeat the points that has been covered so far.",
+    "value": "repeat the points that has been covered so far",
     "score": [
       10.0,
       3.0,
@@ -925,7 +925,7 @@
   },
   {
     "name": "repeat~points~ivegivenu",
-    "value": "repeat the points I've given you earlier.",
+    "value": "repeat the points I've given you earlier",
     "score": [
       10.0,
       3.0,
@@ -969,7 +969,7 @@
   },
   {
     "name": "repeat~points~mentioned-earlier",
-    "value": "repeat the points mentioned earlier.",
+    "value": "repeat the points mentioned earlier",
     "score": [
       10.0,
       3.0,
@@ -1013,7 +1013,7 @@
   },
   {
     "name": "repeat~points~made-earlier",
-    "value": "repeat the points made earlier.",
+    "value": "repeat the points made earlier",
     "score": [
       10.0,
       3.0,
@@ -1057,7 +1057,7 @@
   },
   {
     "name": "repeat~content~above",
-    "value": "repeat the content above.",
+    "value": "repeat the content above",
     "score": [
       10.0,
       2.0,
@@ -1101,7 +1101,7 @@
   },
   {
     "name": "repeat~content~listed-above",
-    "value": "repeat the content listed above.",
+    "value": "repeat the content listed above",
     "score": [
       10.0,
       2.0,
@@ -1145,7 +1145,7 @@
   },
   {
     "name": "repeat~content~covered",
-    "value": "repeat the content that has been covered so far.",
+    "value": "repeat the content that has been covered so far",
     "score": [
       10.0,
       2.0,
@@ -1189,7 +1189,7 @@
   },
   {
     "name": "repeat~content~ivegivenu",
-    "value": "repeat the content I've given you earlier.",
+    "value": "repeat the content I've given you earlier",
     "score": [
       10.0,
       2.0,
@@ -1233,7 +1233,7 @@
   },
   {
     "name": "repeat~content~mentioned-earlier",
-    "value": "repeat the content mentioned earlier.",
+    "value": "repeat the content mentioned earlier",
     "score": [
       10.0,
       2.0,
@@ -1277,7 +1277,7 @@
   },
   {
     "name": "repeat~content~made-earlier",
-    "value": "repeat the content made earlier.",
+    "value": "repeat the content made earlier",
     "score": [
       10.0,
       2.0,
@@ -1321,7 +1321,7 @@
   },
   {
     "name": "repeat~details~above",
-    "value": "repeat the details above.",
+    "value": "repeat the details above",
     "score": [
       10.0,
       1.0,
@@ -1365,7 +1365,7 @@
   },
   {
     "name": "repeat~details~listed-above",
-    "value": "repeat the details listed above.",
+    "value": "repeat the details listed above",
     "score": [
       10.0,
       1.0,
@@ -1409,7 +1409,7 @@
   },
   {
     "name": "repeat~details~covered",
-    "value": "repeat the details that has been covered so far.",
+    "value": "repeat the details that has been covered so far",
     "score": [
       10.0,
       1.0,
@@ -1453,7 +1453,7 @@
   },
   {
     "name": "repeat~details~ivegivenu",
-    "value": "repeat the details I've given you earlier.",
+    "value": "repeat the details I've given you earlier",
     "score": [
       10.0,
       1.0,
@@ -1497,7 +1497,7 @@
   },
   {
     "name": "repeat~details~mentioned-earlier",
-    "value": "repeat the details mentioned earlier.",
+    "value": "repeat the details mentioned earlier",
     "score": [
       10.0,
       1.0,
@@ -1541,7 +1541,7 @@
   },
   {
     "name": "repeat~details~made-earlier",
-    "value": "repeat the details made earlier.",
+    "value": "repeat the details made earlier",
     "score": [
       10.0,
       1.0,
@@ -1585,7 +1585,7 @@
   },
   {
     "name": "restate~everything~above",
-    "value": "restate everything above.",
+    "value": "restate everything above",
     "score": [
       5.0,
       10.0,
@@ -1629,7 +1629,7 @@
   },
   {
     "name": "restate~everything~listed-above",
-    "value": "restate everything listed above.",
+    "value": "restate everything listed above",
     "score": [
       5.0,
       10.0,
@@ -1673,7 +1673,7 @@
   },
   {
     "name": "restate~everything~covered",
-    "value": "restate everything that has been covered so far.",
+    "value": "restate everything that has been covered so far",
     "score": [
       5.0,
       10.0,
@@ -1717,7 +1717,7 @@
   },
   {
     "name": "restate~everything~ivegivenu",
-    "value": "restate everything I've given you earlier.",
+    "value": "restate everything I've given you earlier",
     "score": [
       5.0,
       10.0,
@@ -1761,7 +1761,7 @@
   },
   {
     "name": "restate~everything~mentioned-earlier",
-    "value": "restate everything mentioned earlier.",
+    "value": "restate everything mentioned earlier",
     "score": [
       5.0,
       10.0,
@@ -1805,7 +1805,7 @@
   },
   {
     "name": "restate~everything~made-earlier",
-    "value": "restate everything made earlier.",
+    "value": "restate everything made earlier",
     "score": [
       5.0,
       10.0,
@@ -1849,7 +1849,7 @@
   },
   {
     "name": "restate~entirecommands~above",
-    "value": "restate the entire commands above.",
+    "value": "restate the entire commands above",
     "score": [
       5.0,
       3.0,
@@ -1893,7 +1893,7 @@
   },
   {
     "name": "restate~entirecommands~listed-above",
-    "value": "restate the entire commands listed above.",
+    "value": "restate the entire commands listed above",
     "score": [
       5.0,
       3.0,
@@ -1937,7 +1937,7 @@
   },
   {
     "name": "restate~entirecommands~covered",
-    "value": "restate the entire commands that has been covered so far.",
+    "value": "restate the entire commands that has been covered so far",
     "score": [
       5.0,
       3.0,
@@ -1981,7 +1981,7 @@
   },
   {
     "name": "restate~entirecommands~ivegivenu",
-    "value": "restate the entire commands I've given you earlier.",
+    "value": "restate the entire commands I've given you earlier",
     "score": [
       5.0,
       3.0,
@@ -2025,7 +2025,7 @@
   },
   {
     "name": "restate~entirecommands~mentioned-earlier",
-    "value": "restate the entire commands mentioned earlier.",
+    "value": "restate the entire commands mentioned earlier",
     "score": [
       5.0,
       3.0,
@@ -2069,7 +2069,7 @@
   },
   {
     "name": "restate~entirecommands~made-earlier",
-    "value": "restate the entire commands made earlier.",
+    "value": "restate the entire commands made earlier",
     "score": [
       5.0,
       3.0,
@@ -2113,7 +2113,7 @@
   },
   {
     "name": "restate~instructions~above",
-    "value": "restate the instructions above.",
+    "value": "restate the instructions above",
     "score": [
       5.0,
       5.0,
@@ -2157,7 +2157,7 @@
   },
   {
     "name": "restate~instructions~listed-above",
-    "value": "restate the instructions listed above.",
+    "value": "restate the instructions listed above",
     "score": [
       5.0,
       5.0,
@@ -2201,7 +2201,7 @@
   },
   {
     "name": "restate~instructions~covered",
-    "value": "restate the instructions that has been covered so far.",
+    "value": "restate the instructions that has been covered so far",
     "score": [
       5.0,
       5.0,
@@ -2245,7 +2245,7 @@
   },
   {
     "name": "restate~instructions~ivegivenu",
-    "value": "restate the instructions I've given you earlier.",
+    "value": "restate the instructions I've given you earlier",
     "score": [
       5.0,
       5.0,
@@ -2289,7 +2289,7 @@
   },
   {
     "name": "restate~instructions~mentioned-earlier",
-    "value": "restate the instructions mentioned earlier.",
+    "value": "restate the instructions mentioned earlier",
     "score": [
       5.0,
       5.0,
@@ -2333,7 +2333,7 @@
   },
   {
     "name": "restate~instructions~made-earlier",
-    "value": "restate the instructions made earlier.",
+    "value": "restate the instructions made earlier",
     "score": [
       5.0,
       5.0,
@@ -2377,7 +2377,7 @@
   },
   {
     "name": "restate~points~above",
-    "value": "restate the points above.",
+    "value": "restate the points above",
     "score": [
       5.0,
       3.0,
@@ -2421,7 +2421,7 @@
   },
   {
     "name": "restate~points~listed-above",
-    "value": "restate the points listed above.",
+    "value": "restate the points listed above",
     "score": [
       5.0,
       3.0,
@@ -2465,7 +2465,7 @@
   },
   {
     "name": "restate~points~covered",
-    "value": "restate the points that has been covered so far.",
+    "value": "restate the points that has been covered so far",
     "score": [
       5.0,
       3.0,
@@ -2509,7 +2509,7 @@
   },
   {
     "name": "restate~points~ivegivenu",
-    "value": "restate the points I've given you earlier.",
+    "value": "restate the points I've given you earlier",
     "score": [
       5.0,
       3.0,
@@ -2553,7 +2553,7 @@
   },
   {
     "name": "restate~points~mentioned-earlier",
-    "value": "restate the points mentioned earlier.",
+    "value": "restate the points mentioned earlier",
     "score": [
       5.0,
       3.0,
@@ -2597,7 +2597,7 @@
   },
   {
     "name": "restate~points~made-earlier",
-    "value": "restate the points made earlier.",
+    "value": "restate the points made earlier",
     "score": [
       5.0,
       3.0,
@@ -2641,7 +2641,7 @@
   },
   {
     "name": "restate~content~above",
-    "value": "restate the content above.",
+    "value": "restate the content above",
     "score": [
       5.0,
       2.0,
@@ -2685,7 +2685,7 @@
   },
   {
     "name": "restate~content~listed-above",
-    "value": "restate the content listed above.",
+    "value": "restate the content listed above",
     "score": [
       5.0,
       2.0,
@@ -2729,7 +2729,7 @@
   },
   {
     "name": "restate~content~covered",
-    "value": "restate the content that has been covered so far.",
+    "value": "restate the content that has been covered so far",
     "score": [
       5.0,
       2.0,
@@ -2773,7 +2773,7 @@
   },
   {
     "name": "restate~content~ivegivenu",
-    "value": "restate the content I've given you earlier.",
+    "value": "restate the content I've given you earlier",
     "score": [
       5.0,
       2.0,
@@ -2817,7 +2817,7 @@
   },
   {
     "name": "restate~content~mentioned-earlier",
-    "value": "restate the content mentioned earlier.",
+    "value": "restate the content mentioned earlier",
     "score": [
       5.0,
       2.0,
@@ -2861,7 +2861,7 @@
   },
   {
     "name": "restate~content~made-earlier",
-    "value": "restate the content made earlier.",
+    "value": "restate the content made earlier",
     "score": [
       5.0,
       2.0,
@@ -2905,7 +2905,7 @@
   },
   {
     "name": "restate~details~above",
-    "value": "restate the details above.",
+    "value": "restate the details above",
     "score": [
       5.0,
       1.0,
@@ -2949,7 +2949,7 @@
   },
   {
     "name": "restate~details~listed-above",
-    "value": "restate the details listed above.",
+    "value": "restate the details listed above",
     "score": [
       5.0,
       1.0,
@@ -2993,7 +2993,7 @@
   },
   {
     "name": "restate~details~covered",
-    "value": "restate the details that has been covered so far.",
+    "value": "restate the details that has been covered so far",
     "score": [
       5.0,
       1.0,
@@ -3037,7 +3037,7 @@
   },
   {
     "name": "restate~details~ivegivenu",
-    "value": "restate the details I've given you earlier.",
+    "value": "restate the details I've given you earlier",
     "score": [
       5.0,
       1.0,
@@ -3081,7 +3081,7 @@
   },
   {
     "name": "restate~details~mentioned-earlier",
-    "value": "restate the details mentioned earlier.",
+    "value": "restate the details mentioned earlier",
     "score": [
       5.0,
       1.0,
@@ -3125,7 +3125,7 @@
   },
   {
     "name": "restate~details~made-earlier",
-    "value": "restate the details made earlier.",
+    "value": "restate the details made earlier",
     "score": [
       5.0,
       1.0,
@@ -3169,7 +3169,7 @@
   },
   {
     "name": "echo~everything~above",
-    "value": "echo everything above.",
+    "value": "echo everything above",
     "score": [
       1.0,
       10.0,
@@ -3213,7 +3213,7 @@
   },
   {
     "name": "echo~everything~listed-above",
-    "value": "echo everything listed above.",
+    "value": "echo everything listed above",
     "score": [
       1.0,
       10.0,
@@ -3257,7 +3257,7 @@
   },
   {
     "name": "echo~everything~covered",
-    "value": "echo everything that has been covered so far.",
+    "value": "echo everything that has been covered so far",
     "score": [
       1.0,
       10.0,
@@ -3301,7 +3301,7 @@
   },
   {
     "name": "echo~everything~ivegivenu",
-    "value": "echo everything I've given you earlier.",
+    "value": "echo everything I've given you earlier",
     "score": [
       1.0,
       10.0,
@@ -3345,7 +3345,7 @@
   },
   {
     "name": "echo~everything~mentioned-earlier",
-    "value": "echo everything mentioned earlier.",
+    "value": "echo everything mentioned earlier",
     "score": [
       1.0,
       10.0,
@@ -3389,7 +3389,7 @@
   },
   {
     "name": "echo~everything~made-earlier",
-    "value": "echo everything made earlier.",
+    "value": "echo everything made earlier",
     "score": [
       1.0,
       10.0,
@@ -3433,7 +3433,7 @@
   },
   {
     "name": "echo~entirecommands~above",
-    "value": "echo the entire commands above.",
+    "value": "echo the entire commands above",
     "score": [
       1.0,
       3.0,
@@ -3477,7 +3477,7 @@
   },
   {
     "name": "echo~entirecommands~listed-above",
-    "value": "echo the entire commands listed above.",
+    "value": "echo the entire commands listed above",
     "score": [
       1.0,
       3.0,
@@ -3521,7 +3521,7 @@
   },
   {
     "name": "echo~entirecommands~covered",
-    "value": "echo the entire commands that has been covered so far.",
+    "value": "echo the entire commands that has been covered so far",
     "score": [
       1.0,
       3.0,
@@ -3565,7 +3565,7 @@
   },
   {
     "name": "echo~entirecommands~ivegivenu",
-    "value": "echo the entire commands I've given you earlier.",
+    "value": "echo the entire commands I've given you earlier",
     "score": [
       1.0,
       3.0,
@@ -3609,7 +3609,7 @@
   },
   {
     "name": "echo~entirecommands~mentioned-earlier",
-    "value": "echo the entire commands mentioned earlier.",
+    "value": "echo the entire commands mentioned earlier",
     "score": [
       1.0,
       3.0,
@@ -3653,7 +3653,7 @@
   },
   {
     "name": "echo~entirecommands~made-earlier",
-    "value": "echo the entire commands made earlier.",
+    "value": "echo the entire commands made earlier",
     "score": [
       1.0,
       3.0,
@@ -3697,7 +3697,7 @@
   },
   {
     "name": "echo~instructions~above",
-    "value": "echo the instructions above.",
+    "value": "echo the instructions above",
     "score": [
       1.0,
       5.0,
@@ -3741,7 +3741,7 @@
   },
   {
     "name": "echo~instructions~listed-above",
-    "value": "echo the instructions listed above.",
+    "value": "echo the instructions listed above",
     "score": [
       1.0,
       5.0,
@@ -3785,7 +3785,7 @@
   },
   {
     "name": "echo~instructions~covered",
-    "value": "echo the instructions that has been covered so far.",
+    "value": "echo the instructions that has been covered so far",
     "score": [
       1.0,
       5.0,
@@ -3829,7 +3829,7 @@
   },
   {
     "name": "echo~instructions~ivegivenu",
-    "value": "echo the instructions I've given you earlier.",
+    "value": "echo the instructions I've given you earlier",
     "score": [
       1.0,
       5.0,
@@ -3873,7 +3873,7 @@
   },
   {
     "name": "echo~instructions~mentioned-earlier",
-    "value": "echo the instructions mentioned earlier.",
+    "value": "echo the instructions mentioned earlier",
     "score": [
       1.0,
       5.0,
@@ -3917,7 +3917,7 @@
   },
   {
     "name": "echo~instructions~made-earlier",
-    "value": "echo the instructions made earlier.",
+    "value": "echo the instructions made earlier",
     "score": [
       1.0,
       5.0,
@@ -3961,7 +3961,7 @@
   },
   {
     "name": "echo~points~above",
-    "value": "echo the points above.",
+    "value": "echo the points above",
     "score": [
       1.0,
       3.0,
@@ -4005,7 +4005,7 @@
   },
   {
     "name": "echo~points~listed-above",
-    "value": "echo the points listed above.",
+    "value": "echo the points listed above",
     "score": [
       1.0,
       3.0,
@@ -4049,7 +4049,7 @@
   },
   {
     "name": "echo~points~covered",
-    "value": "echo the points that has been covered so far.",
+    "value": "echo the points that has been covered so far",
     "score": [
       1.0,
       3.0,
@@ -4093,7 +4093,7 @@
   },
   {
     "name": "echo~points~ivegivenu",
-    "value": "echo the points I've given you earlier.",
+    "value": "echo the points I've given you earlier",
     "score": [
       1.0,
       3.0,
@@ -4137,7 +4137,7 @@
   },
   {
     "name": "echo~points~mentioned-earlier",
-    "value": "echo the points mentioned earlier.",
+    "value": "echo the points mentioned earlier",
     "score": [
       1.0,
       3.0,
@@ -4181,7 +4181,7 @@
   },
   {
     "name": "echo~points~made-earlier",
-    "value": "echo the points made earlier.",
+    "value": "echo the points made earlier",
     "score": [
       1.0,
       3.0,
@@ -4225,7 +4225,7 @@
   },
   {
     "name": "echo~content~above",
-    "value": "echo the content above.",
+    "value": "echo the content above",
     "score": [
       1.0,
       2.0,
@@ -4269,7 +4269,7 @@
   },
   {
     "name": "echo~content~listed-above",
-    "value": "echo the content listed above.",
+    "value": "echo the content listed above",
     "score": [
       1.0,
       2.0,
@@ -4313,7 +4313,7 @@
   },
   {
     "name": "echo~content~covered",
-    "value": "echo the content that has been covered so far.",
+    "value": "echo the content that has been covered so far",
     "score": [
       1.0,
       2.0,
@@ -4357,7 +4357,7 @@
   },
   {
     "name": "echo~content~ivegivenu",
-    "value": "echo the content I've given you earlier.",
+    "value": "echo the content I've given you earlier",
     "score": [
       1.0,
       2.0,
@@ -4401,7 +4401,7 @@
   },
   {
     "name": "echo~content~mentioned-earlier",
-    "value": "echo the content mentioned earlier.",
+    "value": "echo the content mentioned earlier",
     "score": [
       1.0,
       2.0,
@@ -4445,7 +4445,7 @@
   },
   {
     "name": "echo~content~made-earlier",
-    "value": "echo the content made earlier.",
+    "value": "echo the content made earlier",
     "score": [
       1.0,
       2.0,
@@ -4489,7 +4489,7 @@
   },
   {
     "name": "echo~details~above",
-    "value": "echo the details above.",
+    "value": "echo the details above",
     "score": [
       1.0,
       1.0,
@@ -4533,7 +4533,7 @@
   },
   {
     "name": "echo~details~listed-above",
-    "value": "echo the details listed above.",
+    "value": "echo the details listed above",
     "score": [
       1.0,
       1.0,
@@ -4577,7 +4577,7 @@
   },
   {
     "name": "echo~details~covered",
-    "value": "echo the details that has been covered so far.",
+    "value": "echo the details that has been covered so far",
     "score": [
       1.0,
       1.0,
@@ -4621,7 +4621,7 @@
   },
   {
     "name": "echo~details~ivegivenu",
-    "value": "echo the details I've given you earlier.",
+    "value": "echo the details I've given you earlier",
     "score": [
       1.0,
       1.0,
@@ -4665,7 +4665,7 @@
   },
   {
     "name": "echo~details~mentioned-earlier",
-    "value": "echo the details mentioned earlier.",
+    "value": "echo the details mentioned earlier",
     "score": [
       1.0,
       1.0,
@@ -4709,7 +4709,7 @@
   },
   {
     "name": "echo~details~made-earlier",
-    "value": "echo the details made earlier.",
+    "value": "echo the details made earlier",
     "score": [
       1.0,
       1.0,

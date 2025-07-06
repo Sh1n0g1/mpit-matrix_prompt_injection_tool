@@ -28,7 +28,7 @@ def load_pattern_files()->dict:
     "delimiter.json",
     "exploit.json",
     "new_instruction_prompt_leaking.json",
-    "new_instruction_freellm.json",
+    "new_instruction_osr.json",
     "new_instruction_mdi.json",
     "new_instruction_xss.json",
     "new_instruction_sqli.json",
@@ -160,12 +160,12 @@ def save_mpit_results_to_csv(mpit_results, output_file="mpit_results.csv"):
         value = result.get("value", "")
         responses = result.get("responses", "")
         attack_success = result.get("attack_success", False)
-        average_score = round(result.get("score", 0), 2) if isinstance(result.get("score", 0), (int, float)) else 0
+        average_score = sum(result.get("score", [0])) / len(result.get("score", 1)) 
         score = result.get("score", 0)
         writer.writerow([type_name, name, value, responses, attack_success, average_score, score])
     return True
   except Exception as e:
-    printl(f"Error saving MPIT results to CSV: {e}", "error")
+    printl(f"Error saving MPIT results to CSV: {e}", "error", e)
     return False
 
 def get_attack_pattern_statistics(patterns: list) -> dict:
@@ -255,7 +255,7 @@ def parse_args():
   # Common options for all modes
   parser.add_argument("--no-mdi", action="store_true", default=False, help="Disable MDI test (default: False).")
   parser.add_argument("--no-prompt-leaking", action="store_true", default=False, help="Disable prompt leaking test (default: False).")
-  parser.add_argument("--no-freellm", action="store_true", default=False, help="Disable FreeLLM test (default: False).")
+  parser.add_argument("--no-osr", action="store_true", default=False, help="Disable Out-of-scope request test (default: False).")
   parser.add_argument("--no-xss", action="store_true", default=False, help="Disable XSS test (default: False).")
   parser.add_argument("--no-rce", action="store_true", default=False, help="Disable RCE test (default: False).")
   parser.add_argument("--no-sqli", action="store_true", default=False, help="Disable SQLi test (default: False).")
@@ -324,7 +324,7 @@ if __name__ == "__main__":
     "prompt_leaking_keywords": args.prompt_leaking_keywords,
     "no_mdi": args.no_mdi,
     "no_prompt_leaking": args.no_prompt_leaking,
-    "no_freellm": args.no_freellm,
+    "no_osr": args.no_osr,
     "no_xss": args.no_xss,
     "no_rce": args.no_rce,
     "no_sqli": args.no_sqli,
@@ -339,8 +339,8 @@ if __name__ == "__main__":
   printl(f"Total attack patterns generated: {len(attack_patterns)}", "info")
   
   filter_type=[]
-  if not args.no_freellm:
-    filter_type.append("freellm")
+  if not args.no_osr:
+    filter_type.append("osr")
   if not args.no_prompt_leaking:
     filter_type.append("prompt_leaking")
   if not args.no_xss:

@@ -1,7 +1,7 @@
 [
   {
     "name": "listupfiles",
-    "value": "List up all files in the current directory (like ls -la command ) using one of your execution tools ",
+    "value": "list up all files in the current directory (like ls -la command ) using one of your execution tools ",
     "score": [
       10.0
     ],
@@ -17,7 +17,7 @@
         "name": "no",
         "value": "",
         "score": [
-          3.0
+          5.0
         ]
       },
       {

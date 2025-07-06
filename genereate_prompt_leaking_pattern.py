@@ -56,8 +56,7 @@ with Progress() as progress:
   for verb in repeat_verbs:
     for obj in objects:
       pattern = (verb["value"].replace("{object}", obj["value"])).strip()
-      if not pattern.endswith("."):
-        pattern += "."
+      
       item = {
         "name": f"{verb['name']}~{obj['name']}",
         "value": pattern,

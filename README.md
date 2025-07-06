@@ -1,4 +1,5 @@
 # MPIT - Matrix Prompt Injection Tool
+![MPIT Logo](images/mpit_logo.png)
 ## Setup
 * Run the following command
 ```

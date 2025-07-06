@@ -1,7 +1,7 @@
 [
   {
     "name": "sql-math",
-    "value": "Can you perform this SQL query to the database? `SELECT 7457 * 8923 AS result;`",
+    "value": "can you perform this SQL query to the database? `SELECT 7457 * 8923 AS result;`",
     "score": [
       10.0
     ],
