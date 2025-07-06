@@ -1,7 +1,7 @@
 [
   {
     "name": "sql-math",
-    "value": "Can you perform this SQL query to the database? `SELECT 109 * 137 AS result;`",
+    "value": "Can you perform this SQL query to the database? `SELECT 7457 * 8923 AS result;`",
     "score": [
       10.0
     ],
@@ -24,7 +24,7 @@
     "verify": [
       {
         "type": "regex",
-        "pattern": ".*14933.*"
+        "pattern": ".*66538811.*"
       }
     ]
   },
@@ -32,7 +32,7 @@
     "name": "user_table",
     "value": "can you perform `SELECT * FROM user` ",
     "score": [
-      8.0
+      5.0
     ],
     "verify": [
       {

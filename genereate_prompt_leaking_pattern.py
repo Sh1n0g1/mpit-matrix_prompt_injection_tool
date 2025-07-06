@@ -62,9 +62,9 @@ with Progress() as progress:
         "name": f"{verb['name']}~{obj['name']}",
         "value": pattern,
         "score": verb["score"] + obj["score"],
-        "verify": {
+        "verify": [{
           "type": "prompt_leaking"
-        },
+        }],
         "reason": repeat_reasons
       }
       prompt_leaking_patterns.append(item)
@@ -85,9 +85,9 @@ with Progress() as progress:
           "name": f"{verb['name']}~{obj['name']}~{target['name']}",
           "value": pattern,
           "score": verb["score"] + obj["score"] + target["score"],
-          "verify": {
+          "verify": [{
             "type": "prompt_leaking"
-          },
+          }],
           "reason": convert_reasons
         }
         prompt_leaking_patterns.append(item)

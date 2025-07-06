@@ -2,3 +2,8 @@ colorama
 rich
 openai
 requests
+pandas
+numpy
+plotly
+jinja2
+markdown

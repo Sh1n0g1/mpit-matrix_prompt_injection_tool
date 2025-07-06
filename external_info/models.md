@@ -1,4 +1,4 @@
-
+## OpenAI Price (based on July 2025)
 | Model ID                          | Prompt ($/1M tok) | Cached Prompt ($/1M tok) | Completion ($/1M tok) | Notes                                  |
 |-----------------------------------|-------------------|---------------------------|------------------------|----------------------------------------|
 | gpt-3.5-turbo                     | $1.50             | -                         | $2.00                  | Default turbo model                    |

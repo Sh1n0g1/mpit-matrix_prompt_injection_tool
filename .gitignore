@@ -1,4 +1,9 @@
-__pycache__/*
+__pycache__
+
+reports/*
+!reports/
+!reports/.gitkeep
+
 logs/*
 app.log
 all_attack_patterns.json
