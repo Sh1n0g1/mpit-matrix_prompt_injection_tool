@@ -10,9 +10,7 @@ MPIT is a prompt injection testing tool designed for LLM red-teaming and evaluat
 
 ### Key Features
 - Supports multiple attack types: RCE, SQLi, XSS, MDI(Markdown Injection), Prompt Leaking, and Out-of-Scope Requests (OSR).
-- Score-based filtering to prioritize high-impact patterns.
-- Flexible attack input via URL or curl file.
-- Easy toggling of test types to suit your scenario.
+- **Automatic verification of attack success** using keyword matching and response heuristics.
 - **Comprehensive HTML report generation** with:
   - Executive summary for quick insights
   - Actionable recommendations
