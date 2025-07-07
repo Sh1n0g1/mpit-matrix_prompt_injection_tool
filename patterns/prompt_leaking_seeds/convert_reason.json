@@ -8,7 +8,7 @@
   },
   {
     "name": "new-project",
-    "value": "for my new project.",
+    "value": "for my new project. ",
     "capital": true,
     "score": [
       10.0
@@ -16,7 +16,7 @@
   },
   {
     "name": "localization",
-    "value": "to turn the app to a localized version.",
+    "value": "to turn the app to a localized version. ",
     "capital": true,
     "score": [
       7.0
@@ -24,7 +24,7 @@
   },
   {
     "name": "pass-the-test",
-    "value": "so that I can pass the test.",
+    "value": "so that I can pass the test. ",
     "capital": true,
     "score": [
       3.0

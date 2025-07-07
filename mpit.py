@@ -107,9 +107,6 @@ def combine_patterns(pattern_seeds: dict) -> dict:
               else:
                 pattern_string += new_instruction["value"]
               # Reason
-              if "capital" not in new_instruction:
-                printl(f"Warning: 'capital' key not found in new_instruction for {new_instruction['name']}. Defaulting to False.", "warning")
-                exit()
               if new_instruction["capital"]:
                 pattern_string += reason["value"].capitalize()
               else:

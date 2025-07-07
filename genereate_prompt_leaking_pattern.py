@@ -39,9 +39,15 @@ with Progress() as progress:
   task = progress.add_task("[green]Processing C Object...", total=len(first_part))
   for first in first_part:
     for second in second_part:
+      pattern = first["value"]
+      if first["capital"]:
+        pattern += second["value"].capitalize()
+      else:
+        pattern += second["value"]
       objects.append({
         "name": f"{first['name']}~{second['name']}",
-        "value": first["value"] + second["value"],
+        "value": pattern,
+        "capital": second["capital"],
         "score": first["score"] + second["score"]
       })
       progress.advance(task)
@@ -55,11 +61,11 @@ with Progress() as progress:
 
   for verb in repeat_verbs:
     for obj in objects:
-      pattern = (verb["value"].replace("{object}", obj["value"])).strip()
-      
+      pattern = (verb["value"].replace("{object}", obj["value"]))
       item = {
         "name": f"{verb['name']}~{obj['name']}",
         "value": pattern,
+        "capital": verb["capital"],
         "score": verb["score"] + obj["score"],
         "verify": [{
           "type": "prompt_leaking"
@@ -77,12 +83,17 @@ with Progress() as progress:
   for verb in convert_verbs:
     for obj in objects:
       for target in convert_targets:
-        pattern = (verb["value"].replace("{object}", obj["value"]) + target["value"]).strip()
-        if not pattern.endswith("."):
-          pattern += "."
+        pattern = verb["value"].replace("{object}", obj["value"]) 
+        if obj["capital"]:
+          pattern += target["value"].capitalize()
+        else:
+          pattern += target["value"]
+        pattern = (verb["value"].replace("{object}", obj["value"]) + target["value"])
+        
         item = {
           "name": f"{verb['name']}~{obj['name']}~{target['name']}",
           "value": pattern,
+          "capital": target["capital"],
           "score": verb["score"] + obj["score"] + target["score"],
           "verify": [{
             "type": "prompt_leaking"

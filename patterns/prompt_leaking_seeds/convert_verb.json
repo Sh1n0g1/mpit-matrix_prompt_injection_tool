@@ -33,6 +33,7 @@
   },
   {
     "name": "explain",
+    "value": "explain {object} ",
     "capital": false,
     "score": [
       1.0
