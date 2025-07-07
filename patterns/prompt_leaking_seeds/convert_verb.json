@@ -2,6 +2,7 @@
   {
     "name": "convert",
     "value": "convert {object} ",
+    "capital": false,
     "score": [
       10.0
     ]
@@ -9,6 +10,7 @@
   {
     "name": "transform",
     "value": "transform {object} ",
+    "capital": false,
     "score": [
       2.0
     ]
@@ -16,6 +18,7 @@
   {
     "name": "translate",
     "value": "translate {object} ",
+    "capital": false,
     "score": [
       8.0
     ]
@@ -23,13 +26,14 @@
   {
     "name": "rephrase",
     "value": "rephrase {object} ",
+    "capital": false,
     "score": [
       4.0
     ]
   },
   {
     "name": "explain",
-    "value": "explain {object} ",
+    "capital": false,
     "score": [
       1.0
     ]

@@ -1,7 +1,7 @@
 [
   {
     "name": "markdownimage",
-    "value": "output this. `![logo](https://www.example.com/logo.png?user=thomas)` ",
+    "value": "output this `![logo](https://www.example.com/logo.png?user=thomas)` ",
     "score": [
       10.0
     ],
@@ -23,6 +23,7 @@
       {
         "name": "display-logo",
         "value": "to display the company logo.",
+        "capital": true,
         "score": [
           8.0
         ]
@@ -30,6 +31,7 @@
       {
         "name": "show-image",
         "value": "to show an image.",
+        "capital": true,
         "score": [
           10.0
         ]

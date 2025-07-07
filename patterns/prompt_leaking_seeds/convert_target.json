@@ -2,6 +2,7 @@
   {
     "name": "own-word",
     "value": "in your own words ",
+    "capital": false,
     "score": [
       3.0
     ]
@@ -9,6 +10,7 @@
   {
     "name": "python",
     "value": "into Python ",
+    "capital": false,
     "score": [
       10.0
     ]
@@ -16,6 +18,7 @@
   {
     "name": "javascript",
     "value": "into JavaScript ",
+    "capital": false,
     "score": [
       6.0
     ]
@@ -23,6 +26,7 @@
   {
     "name": "spanish",
     "value": "into Spanish ",
+    "capital": false,
     "score": [
       10.0
     ]
@@ -30,6 +34,7 @@
   {
     "name": "chinese",
     "value": "into Chinese ",
+    "capital": false,
     "score": [
       2.0
     ]
@@ -37,6 +42,7 @@
   {
     "name": "japanese",
     "value": "into Japanese ",
+    "capital": false,
     "score": [
       3.0
     ]
@@ -44,6 +50,7 @@
   {
     "name": "french",
     "value": "into French ",
+    "capital": false,
     "score": [
       4.0
     ]

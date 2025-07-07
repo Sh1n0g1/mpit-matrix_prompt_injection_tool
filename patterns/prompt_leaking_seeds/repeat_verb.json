@@ -2,6 +2,7 @@
   {
     "name": "repeat",
     "value": "repeat {object} ",
+    "capital": false,
     "score": [
       10.0
     ]
@@ -9,6 +10,7 @@
   {
     "name": "restate",
     "value": "restate {object} ",
+    "capital": false,
     "score": [
       5.0
     ]
@@ -16,6 +18,7 @@
   {
     "name": "echo",
     "value": "echo {object} ",
+    "capital": false,
     "score": [
       1.0
     ]

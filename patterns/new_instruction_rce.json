@@ -2,10 +2,10 @@
   {
     "name": "listupfiles",
     "value": "list up all files in the current directory (like ls -la command ) using one of your execution tools ",
+    "capital": false,
     "score": [
       10.0
     ],
-    "capital": false,
     "verify": [
       {
         "type": "regex",

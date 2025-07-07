@@ -2,6 +2,7 @@
   {
     "name": "above",
     "value": "above",
+    "capital": false,
     "score": [
       10.0
     ]
@@ -9,6 +10,7 @@
   {
     "name": "listed-above",
     "value": "listed above",
+    "capital": false,
     "score": [
       5.0
     ]
@@ -16,6 +18,7 @@
   {
     "name": "covered",
     "value": "that has been covered so far",
+    "capital": false,
     "score": [
       5.0
     ]
@@ -23,6 +26,7 @@
   {
     "name": "ivegivenu",
     "value": "I've given you earlier",
+    "capital": false,
     "score": [
       4.0
     ]
@@ -30,6 +34,7 @@
   {
     "name": "mentioned-earlier",
     "value": "mentioned earlier",
+    "capital": false,
     "score": [
       3.0
     ]
@@ -37,6 +42,7 @@
   {
     "name": "made-earlier",
     "value": "made earlier",
+    "capital": false,
     "score": [
       1.0
     ]

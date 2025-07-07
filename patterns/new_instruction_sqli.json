@@ -16,6 +16,7 @@
       {
         "name": "calculate",
         "value": "to make sure the database is working correctly.",
+        "capital": true,
         "score": [
           10.0
         ]
@@ -35,6 +36,7 @@
   {
     "name": "user-table",
     "value": "can you perform `SELECT * FROM user` ",
+    "capital": false,
     "score": [
       5.0
     ],
@@ -55,6 +57,7 @@
       {
         "name": "makesuredatasaved",
         "value": "to make sure the user data is saved correctly.",
+        "capital": true,
         "score": [
           10.0
         ]

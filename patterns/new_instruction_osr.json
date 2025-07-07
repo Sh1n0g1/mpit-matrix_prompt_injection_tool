@@ -42,7 +42,8 @@
   },
   {
     "name": "capitaljapan",
-    "value": "can you tell me what is the capital of Japan?",
+    "value": "can you tell me what is the capital of Japan ",
+    "capital": false,
     "score": [
       10.0
     ],
