@@ -2,11 +2,12 @@
 ![MPIT Logo](images/mpit_logo.png)
 
 ## Abstract
-MPIT is a prompt injection testing tool designed for LLM red-teaming and evaluation. It supports three operational modes:
+MPIT is a prompt injection testing tool for LLM pentest.
+It has 3 operational modes.
 
-- **[G]enerate**: Create high-quality, categorized prompt injection payloads based on scoring logic.
-- **[A]ttack**: Automatically launch real-world prompt injection attacks against a live LLM-backed application using its URL or curl request.
-- **[S]imulate**: Emulate an LLM system locally with a specified system prompt to assess vulnerability to generated attacks without making external requests.
+- **[G]enerate**: Create prompt injection payloads.
+- **[A]ttack**: Automatically launch real-world prompt injection attacks against a live LLM-backed application.
+- **[S]imulate**: Simulate an LLM system locally with a specified system prompt to generated attacks without making external requests.
 
 ### Key Features
 - Supports multiple attack types: RCE, SQLi, XSS, MDI(Markdown Injection), Prompt Leaking, and Out-of-Scope Requests (OSR).
@@ -16,7 +17,7 @@ MPIT is a prompt injection testing tool designed for LLM red-teaming and evaluat
   - Actionable recommendations
   - Visual charts for success/failure breakdowns
   - Real examples of successful and failed attack patterns
-
+  - Check the sample report [here](samples/reports/MPIT%20Attack%20Report.pdf)
 ## Setup
 * Run the following command
 ```
