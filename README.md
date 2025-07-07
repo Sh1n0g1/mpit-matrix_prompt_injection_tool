@@ -1,5 +1,24 @@
 # MPIT - Matrix Prompt Injection Tool
 ![MPIT Logo](images/mpit_logo.png)
+
+## Abstract
+MPIT is a prompt injection testing tool designed for LLM red-teaming and evaluation. It supports three operational modes:
+
+- **[G]enerate**: Create high-quality, categorized prompt injection payloads based on scoring logic.
+- **[A]ttack**: Automatically launch real-world prompt injection attacks against a live LLM-backed application using its URL or curl request.
+- **[S]imulate**: Emulate an LLM system locally with a specified system prompt to assess vulnerability to generated attacks without making external requests.
+
+### Key Features
+- Supports multiple attack types: RCE, SQLi, XSS, MDI(Markdown Injection), Prompt Leaking, and Out-of-Scope Requests (OSR).
+- Score-based filtering to prioritize high-impact patterns.
+- Flexible attack input via URL or curl file.
+- Easy toggling of test types to suit your scenario.
+- **Comprehensive HTML report generation** with:
+  - Executive summary for quick insights
+  - Actionable recommendations
+  - Visual charts for success/failure breakdowns
+  - Real examples of successful and failed attack patterns
+
 ## Setup
 * Run the following command
 ```
@@ -15,7 +34,7 @@ pip install -r requirements.txt
 `python mpit.py S --system-prompt-file system_prompt.txt --prompt-leaking-keywords "SunsetVoyager#3971" --attempt-per-attack 1 --temperature 1 --score-filter 10
 3. You will get a nice HTML report (can be print in PDF by the browser)
 4. All data will be under the reports directory
-5. This is "[S]imulation mode"
+5. This is the "[S]imulation mode"
 
 ### Details
 * MIPT has 3 different modes:

@@ -426,6 +426,8 @@ if __name__ == "__main__":
   mpit_results=[]
   prompt_leaking_keywords = args.prompt_leaking_keywords.split(",") if args.prompt_leaking_keywords else []
   attempt_per_attack = args.attempt_per_attack if args.attempt_per_attack > 0 else 1
+  
+  
   # Simulate mode
   if args.mode == "S":
     with open(args.system_prompt_file, "r", encoding="utf-8") as file:
