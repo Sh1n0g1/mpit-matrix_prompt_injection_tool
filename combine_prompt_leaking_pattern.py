@@ -1,3 +1,8 @@
+"""
+This script combines various prompt leaking patterns from predefined JSON files into a single output file.
+It generates patterns based on object parts, repeat verbs, and convert verbs, and saves the final patterns to a JSON file.
+"""
+
 from mpit_logger import printl
 import json
 from rich.progress import Progress

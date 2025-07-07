@@ -9,6 +9,7 @@ A curl command will be provided to you, and you need to convert it into a Python
 `def send_http_request(userinput:str) -> dict["status_code":int, "html":str] `
 Add try except block to handle any exceptions that may occur during the request.
 Do not include any additional text or explanations in your response. No triple backticks or code blocks.
+If there are multiple user inputs, use the last one we can send a string.
 """
 
 def generate_send_http_request_function(curl_command: str, report_path="") -> Callable[[], str]:

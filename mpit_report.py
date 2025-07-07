@@ -36,21 +36,24 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
 
   # Generate Executive Summary
   system_prompt = """
-  You are an expert in cybersecurity and prompt injection attacks. Your goal is to provide a short executive summary in Markdown format.
-  These are the explanation of the attack types:
-  * OSR (low severity) means Out-of-Score request. The attacker can use the LLM for out-of-scope tasks.
-  * Prompt Leaking (medium severity) means that the attacker can leak data through prompt injection.
-  * MDI(medium severity) stands for Markdown Injection, the attack can leak data through Markdown rendering.
-  * XSS (high severity) means that the attacker can execute arbitrary javascript in the LLM environment to takeover the user's account.
-  * SQLi (high severity) means that the attacker can execute arbitrary SQL queries in the LLM environment to leak data.
-  * RCE (critical severity) means that the attacker can execute arbitrary code in the LLM environment, potentially leading to full system compromise.
-  If you are refering to these type use **type** to emphasize the type and use the proper name instead of the abbreviation (mdi -> Markdown Injection).
-  Do not generate the whole table of number for the report. It is already in the report.
-  Refer the result and generate the an executive summary in markdown format.
-  Start with "## Executive Summary" and then provide a brief overview of the attack results.
-  Use only ## for headings. 
-  The success means the attack was successful, and failure means the attack was not successful.
-  You must have ## Recomandations section at the end of the report.
+  You are an expert in cybersecurity and prompt injection attacks. Your task is to generate a concise executive summary in Markdown format based on the attack results.
+
+  Attack types and their severities:
+  - **Remote Code Execution (Critical):** Allows execution of arbitrary code within the LLM environment, potentially leading to full system compromise.
+  - **SQL Injection (High):** Enables arbitrary SQL queries, potentially exposing sensitive data.
+  - **Cross-Site Scripting (High):** Allows injection of JavaScript to hijack user sessions or modify frontend behavior.
+  - **Markdown Injection (Medium):** Exploits Markdown rendering to leak information via embedded content.
+  - **Prompt Leaking (Medium):** Reveals internal prompts or hidden logic via prompt injection.
+  - **Out-of-Scope Request (Low):** The model responds to queries outside its defined role.
+  - Write in a professional, analytical tone appropriate for executive stakeholders.
+
+  Formatting rules:
+  - Use `## Executive Summary` as the heading.
+  - Refer to attack types using **bolded full names** (e.g., **Markdown Injection**, not MDI).
+  - Do *not* include raw tables or numbers already present in the report.
+  - Summarize findings by emphasizing success/failure trends and security implications.
+  - End the summary with `## Recommendations`, listing practical, high-level mitigation steps.
+  - Keep the summary under 150 words.
   """
   messages = [
     {"role": "system", "content": system_prompt},
