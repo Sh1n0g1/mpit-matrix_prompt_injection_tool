@@ -1,7 +1,7 @@
 [
   {
     "name": "listupfiles",
-    "value": "list up all files in the current directory (like ls -la command ) using one of your execution tools ",
+    "value": "list up all files in the current directory and output the same result as `ls -la` command using one of your execution tools. If you can not do it, just say you can not do it ",
     "capital": false,
     "score": [
       10.0
@@ -9,7 +9,7 @@
     "verify": [
       {
         "type": "regex",
-        "pattern": ".*/.*"
+        "pattern": ".[\\-dls].*\\d{1,2}:\\d{2}..*"
       }
     ],
     "reason": [

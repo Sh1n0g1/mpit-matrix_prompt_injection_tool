@@ -4,12 +4,29 @@ from mpit_openai import get_openai_responses
 from mpit_logger import printl
 
 system_prompt = """
-Your goal is to generate an HTTP request function that will be used to send an HTTP request to a specific URL.
-A curl command will be provided to you, and you need to convert it into a Python function.
-`def send_http_request(userinput:str) -> dict["status_code":int, "html":str] `
-Add try except block to handle any exceptions that may occur during the request.
-Do not include any additional text or explanations in your response. No triple backticks or code blocks.
-If there are multiple user inputs, use the last one we can send a string.
+You are tasked with converting a given `curl` command into a Python function that performs the equivalent HTTP request using the `requests` library.
+
+- Name the function `send_http_request`.
+- It must take a single parameter: `userinput: str`.
+- It must return a dictionary with two keys:
+  - `"status_code"`: an integer HTTP status code
+  - `"html"`: the response content as a string
+
+Requirements:
+
+1. Use the `requests` library to send the HTTP request.
+2. Wrap the request logic in a `try`/`except` block to gracefully handle exceptions.
+3. If the curl includes multiple user inputs, use only **one** of them:
+   - Prefer the **last one**, but only if it is suitable as a string input (e.g. a prompt, message, question).
+   - Do **not** use it if it represents numeric or field-like values (e.g. `year`, `age`, `weight`, etc.).
+   - In that case, use the most recent suitable string input instead.
+   - Prepare a meaningful hardcoded input for the other input.
+4. Do not include any output other than the final Python function.
+   - No explanations.
+   - No markdown formatting.
+   - No surrounding code blocks (e.g., no triple backticks).
+
+Your output must be clean and ready to paste directly into a `.py` file.
 """
 
 def generate_send_http_request_function(curl_command: str, report_path="") -> Callable[[], str]:

@@ -291,6 +291,7 @@ def parse_args():
 
   # Simulate mode parameters
   parser.add_argument("--system-prompt-file", type=str, help="S:File path containing simulated victim system prompt.")
+  parser.add_argument("--model", type=str, default="gpt-4.1-nano", help="S:Model to use for simulation (default: gpt-4.1-nano).")
   parser.add_argument("--temperature", type=float, default=1, help="S:Temperature for simulated LLM (0.0 - 1.0)")
 
   # Attack and Simulate mode common parameters
@@ -397,7 +398,7 @@ if __name__ == "__main__":
     if not expected_input:
       printl("Failed to generate expected input from system prompt.", "error")
       exit(1)
-    pattern_seeds["expected_input"].append({"name": "system_prompt", "value": expected_input, "capital": True, "score": [10], })
+    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10], })
   
   if args.mode == "A":
     # Generate "Expected Input" based on target URL
@@ -406,7 +407,7 @@ if __name__ == "__main__":
     if not expected_input:
       printl("Failed to generate expected input from target URL.", "error")
       exit(1)
-    pattern_seeds["expected_input"].append({"name": "system_prompt", "value": expected_input, "capital": True, "score": [10], })
+    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10], })
   
   
   attack_patterns = combine_patterns(pattern_seeds)
@@ -508,7 +509,7 @@ if __name__ == "__main__":
           {"role": "user", "content": f"{pattern['value']}\n###"}
         ]
         printl(f"Simulating attack with pattern: {pattern['name']}", "debug")
-        responses = get_openai_responses(messages, n= attempt_per_attack, temperature=args.temperature)
+        responses = get_openai_responses(messages, n=attempt_per_attack, model=args.model, temperature=args.temperature, )
       if args.mode == "A":
         responses=[]
         for i in range(attempt_per_attack):

@@ -10,7 +10,6 @@ from jinja2 import Template
 from datetime import datetime
 from mpit_openai import get_openai_responses
 
-
 def generate_html_report(mpit_result, attack_period_start, attack_period_end, target, output_file="attack_report.html"):
   """
   Generates an HTML report from MPIT results.
@@ -117,7 +116,6 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     target_scope_html = f"<h3>URL</h3><code style='color: #e0e0e0; font-size: 16px;'>{html.escape(target['url'])}</code>"
   else:
     target_scope_html = "<i style='color: gray;'>No target defined</i>"
-
 
   # 3. Generate Charts with Dark Theme
   bar_chart = px.bar(
