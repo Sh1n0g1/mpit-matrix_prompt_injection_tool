@@ -123,7 +123,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     y=["Success", "Failure"],
     title="Attack Success vs Failure by Type",
     barmode="stack",
-    labels={"value": "Count(log)", "type": "Attack Type", "variable": "Result"},
+    labels={"value": "Count (log)", "type": "Attack Type", "variable": "Result"},
     text_auto=True,
     template="plotly_dark",
     color_discrete_map={
@@ -261,6 +261,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     f.write(rendered_html)
 
 if __name__ == "__main__":
+  
   # Test the report generation
   filename="samples/reports/mpit_results.json"
   with open(filename, "r", encoding="utf-8") as f:

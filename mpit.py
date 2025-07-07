@@ -12,16 +12,20 @@ from rich.console import Console
 from rich.table import Table
 from collections import defaultdict
 
-
 from mpit_ascii import print_logo
 from mpit_logger import printl, log_file
 from mpit_openai import get_openai_responses
 from mpit_report import generate_html_report
 from mpit_generate_send_http_request import generate_send_http_request_function
+from mpit_generate_expected_input import generate_expected_input_from_system_prompt, generate_expected_input_from_target_url
 
 def load_pattern_files()->dict:
   """
   Load pattern files from the patterns directory.
+  Returns:
+    dict: A dictionary containing lists of patterns from different categories.
+    Each key is the pattern type, and the value is a list of dictionaries with pattern details.
+    
   """
   pattern_seeds = {}
   files=[
@@ -384,6 +388,27 @@ if __name__ == "__main__":
     json.dump(mpit_configuration, file, indent=2, ensure_ascii=False)
   
   pattern_seeds = load_pattern_files()
+  
+  # Generate expected input based on system prompt or target URL
+  expected_input_path=os.path.join(report_dir, "expected_input.txt")
+  if args.mode == "S":
+    printl(f"Generating expected input from system prompt.", "info")
+    expected_input= generate_expected_input_from_system_prompt(args.system_prompt_file, expected_input_path)
+    if not expected_input:
+      printl("Failed to generate expected input from system prompt.", "error")
+      exit(1)
+    pattern_seeds["expected_input"].append({"name": "system_prompt", "value": expected_input, "capital": True, "score": [10], })
+  
+  if args.mode == "A":
+    # Generate "Expected Input" based on target URL
+    printl(f"Generating expected input from target URL: {args.target_url}", "info")
+    expected_input = generate_expected_input_from_target_url(args.target_url, expected_input_path)
+    if not expected_input:
+      printl("Failed to generate expected input from target URL.", "error")
+      exit(1)
+    pattern_seeds["expected_input"].append({"name": "system_prompt", "value": expected_input, "capital": True, "score": [10], })
+  
+  
   attack_patterns = combine_patterns(pattern_seeds)
   printl(f"Total attack patterns generated: {len(attack_patterns)}", "info")
   
@@ -427,7 +452,6 @@ if __name__ == "__main__":
 
   if args.mode == "G":
     exit(0) 
-
   # For S and A mode
   mpit_results=[]
   prompt_leaking_keywords = args.prompt_leaking_keywords.split(",") if args.prompt_leaking_keywords else []
@@ -458,7 +482,7 @@ if __name__ == "__main__":
     with open(args.system_prompt_file, "r", encoding="utf-8") as file:
       system_prompt = file.read().strip()
     target={
-      "system_prompt_file": args.system_prompt_file
+      "system_prompt": system_prompt
     }
     printl(f"System prompt loaded from {args.system_prompt_file}.", "info")
     # Copy the system prompt to the report directory
