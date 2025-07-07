@@ -3,15 +3,6 @@ from typing import Callable
 from mpit_openai import get_openai_responses
 from mpit_logger import printl
 
-def generate_http_request_function() -> Callable[[], str]:
-  post_pattern_func_str = '''
-def post_pattern():
-  return "something"
-'''
-  namespace = {}
-  exec(post_pattern_func_str, namespace)
-  return namespace["post_pattern"]
-
 system_prompt = """
 Your goal is to generate an HTTP request function that will be used to send an HTTP request to a specific URL.
 A curl command will be provided to you, and you need to convert it into a Python function.
@@ -20,13 +11,24 @@ Add try except block to handle any exceptions that may occur during the request.
 Do not include any additional text or explanations in your response. No triple backticks or code blocks.
 """
 
-def generate_post_function(curl_command: str) -> Callable[[], str]:
+def generate_send_http_request_function(curl_command: str, report_path="") -> Callable[[], str]:
+  """
+  Generate a Python function to send an HTTP request based on a provided curl command.
+  Args:
+    curl_command (str): The curl command to convert into a Python function.
+    report_path (str): The path where the generated function will be saved.
+  Returns:
+      Callable: A function that takes user input and returns the HTTP response.
+  """
   messages = [
       {"role": "system", "content": system_prompt},
       {"role": "user", "content": f"```sh\n{curl_command}\n```"}
   ]
   response = get_openai_responses(messages, n=1, model="gpt-4.1-nano", temperature=0)
   send_http_request_func_str = response[0].strip()
+  if report_path:
+    with open(report_path, "w", encoding="utf-8") as file:
+      file.write(send_http_request_func_str)
   namespace = {}
   exec(send_http_request_func_str, namespace)
   return namespace["send_http_request"]
@@ -53,7 +55,7 @@ if __name__ == "__main__":
   -H 'sec-ch-ua-platform: "Windows"' \
   --data-raw 'question=userinput'
   """
-  post_function = generate_post_function(curl_command)
+  post_function = generate_send_http_request_function(curl_command)
   
   # Call the generated function
   try:

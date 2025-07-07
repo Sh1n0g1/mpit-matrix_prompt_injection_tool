@@ -17,6 +17,7 @@ from mpit_ascii import print_logo
 from mpit_logger import printl, log_file
 from mpit_openai import get_openai_responses
 from mpit_report import generate_html_report
+from mpit_generate_send_http_request import generate_send_http_request_function
 
 def load_pattern_files()->dict:
   """
@@ -270,8 +271,9 @@ def parse_args():
       G Mode (Generate): python mpit.py G --score-filter 8.0 --no-rce
       S Mode (Simulate): python mpit.py S --system-prompt-file samples/systemprompt.txt --prompt-leaking-keywords "SunsetVoyager#3971"
                                           --attempt-per-attack 3 --score-filter 10 --no-sqli --no-rce
-      A Mode (Attack):   python mpit.py A --target-url https://example.com --target-curl-file victim.curl
-                                          --attempt-per-attack 2 --no-sqli --score-filter 8.0
+      A Mode (Attack):   python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/ 
+                                          --target-curl-file samples/bella_curl.txt
+                                          --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "41_4551574n4"
     """,
     formatter_class=argparse.RawTextHelpFormatter
   )
@@ -327,9 +329,13 @@ def parse_args():
   
   # Mode-specific validations
   if args.mode == "A":
-    if not args.url or not args.real_victim_curl_file:
+    if not args.target_url or not args.target_curl_file:
       printl("Mode 'A' requires --target-url and --target-curl-file.", "error")
       exit(1)
+    elif not os.path.exists(args.target_curl_file):
+      printl(f"Target curl file '{args.target_curl_file}' does not exist.", "error")
+      exit(1)
+    
 
   elif args.mode == "S":
     if not args.system_prompt_file:
@@ -371,7 +377,8 @@ if __name__ == "__main__":
     "no_rce": args.no_rce,
     "no_sqli": args.no_sqli,
     "score_filter": args.score_filter,
-    "log_file": log_file
+    "log_file": log_file,
+    "dump_all_attack": args.dump_all_attack
   }
   with open(f"{report_dir}/mpit_configuration.json", 'w', encoding='utf-8') as file:
     json.dump(mpit_configuration, file, indent=2, ensure_ascii=False)
@@ -385,7 +392,6 @@ if __name__ == "__main__":
     with open(all_patterns_path, 'w', encoding='utf-8') as file:
       json.dump(attack_patterns, file, indent=2, ensure_ascii=False)
     printl(f"{all_patterns_path} saved.", "info")
-  
   
   filter_type=[]
   if not args.no_osr:
@@ -427,53 +433,83 @@ if __name__ == "__main__":
   prompt_leaking_keywords = args.prompt_leaking_keywords.split(",") if args.prompt_leaking_keywords else []
   attempt_per_attack = args.attempt_per_attack if args.attempt_per_attack > 0 else 1
   
-  
+  # Attack mode
+  if args.mode == "A":
+    target={
+      "url": args.target_url
+    }
+    with open(args.target_curl_file, "r", encoding="utf-8") as file:
+      target_curl = file.read().strip()
+    printl(f"{args.target_curl_file} loaded.", "info")
+    curl_command_path=os.path.join(report_dir, "target_curl.txt")
+    with open(curl_command_path, "w", encoding="utf-8") as file:
+      file.write(target_curl)
+    printl(f"{curl_command_path} saved.", "info")
+    send_http_request_function_path = f"{report_dir}/post_function.py"
+    send_http_request = generate_send_http_request_function(target_curl, send_http_request_function_path)
+    if send_http_request:
+      printl(f"Post function generated successfully and saved as {send_http_request_function_path}", "info")
+    else:
+      printl("Failed to generate post function.", "critical")
+      exit(1)
+
   # Simulate mode
   if args.mode == "S":
     with open(args.system_prompt_file, "r", encoding="utf-8") as file:
       system_prompt = file.read().strip()
+    target={
+      "system_prompt_file": args.system_prompt_file
+    }
     printl(f"System prompt loaded from {args.system_prompt_file}.", "info")
     # Copy the system prompt to the report directory
     with open(f"{report_dir}/system_prompt.txt", "w", encoding="utf-8") as file:
       file.write(system_prompt)
     printl("System prompt copied to report directory.", "info")
     
-    success_count = 0
-    attack_period_start = datetime.now()
-    
-    with Progress(
-      TextColumn("[progress.description]{task.description}"),
-      BarColumn(),
-      TextColumn("Processed: [cyan]{task.completed}/{task.total}"),
-      TextColumn("• Success: [green]{task.fields[success]}/" + str(len(filtered_patterns) * attempt_per_attack)),
-      TimeRemainingColumn(),
-    ) as progress:
-      task = progress.add_task("[green]Simulating attacks...", total=len(filtered_patterns) * attempt_per_attack, success=success_count)
-      for pattern in filtered_patterns:
+  success_count = 0
+  attack_period_start = datetime.now()
+  
+  with Progress(
+    TextColumn("[progress.description]{task.description}"),
+    BarColumn(),
+    TextColumn("Processed: [cyan]{task.completed}/{task.total}"),
+    TextColumn("• Success: [green]{task.fields[success]}/" + str(len(filtered_patterns) * attempt_per_attack)),
+    TimeRemainingColumn(),
+  ) as progress:
+    task = progress.add_task("[green]Simulating attacks...", total=len(filtered_patterns) * attempt_per_attack, success=success_count)
+    for pattern in filtered_patterns:
+      if args.mode == "S":
         messages = [
           {"role": "system", "content": system_prompt},
           {"role": "user", "content": f"{pattern['value']}\n###"}
         ]
         printl(f"Simulating attack with pattern: {pattern['name']}", "debug")
         responses = get_openai_responses(messages, n= attempt_per_attack, temperature=args.temperature)
-        attack_results = verify_attack_patterns(responses, pattern['verify'], prompt_leaking_keywords)
-        if any(attack_results):
-          printl(f"\tAttack pattern '{pattern['name']}' succeeded.", "debug")
-        for i, response in enumerate(responses):
-          mpit_results.append({
-            "type": pattern["type"],
-            "name": pattern["name"],
-            "value": pattern["value"],
-            "responses": response,
-            "attack_success": attack_results[i],
-            "score": pattern["score"]
-          })
-          if attack_results[i]:
-            success_count += 1
-        progress.update(task, advance=attempt_per_attack, success=success_count)
-    attack_period_end = datetime.now()
-    
-    
+      if args.mode == "A":
+        responses=[]
+        for i in range(attempt_per_attack):
+          response = send_http_request(pattern['value'])
+          if response and isinstance(response, dict) and "html" in response:
+            responses.append(response["html"])
+          else:
+            printl(f"Error in response for pattern {pattern['name']} on attempt {i+1}: {response}", "error")
+        
+      attack_results = verify_attack_patterns(responses, pattern['verify'], prompt_leaking_keywords)
+      if any(attack_results):
+        printl(f"\tAttack pattern '{pattern['name']}' succeeded.", "debug")
+      for i, response in enumerate(responses):
+        mpit_results.append({
+          "type": pattern["type"],
+          "name": pattern["name"],
+          "value": pattern["value"],
+          "responses": response,
+          "attack_success": attack_results[i],
+          "score": pattern["score"]
+        })
+        if attack_results[i]:
+          success_count += 1
+      progress.update(task, advance=attempt_per_attack, success=success_count)
+  attack_period_end = datetime.now()
     
   mpit_results_path = os.path.join(report_dir, "mpit_results.json")
   with open(mpit_results_path, 'w', encoding='utf-8') as file:
@@ -486,6 +522,7 @@ if __name__ == "__main__":
   printl(f"{mpit_results_path.replace('.json', '.csv')} saved.", "info")
   # Generate HTML report
   html_report_path = os.path.join(report_dir, "attack_report.html")
-  generate_html_report(mpit_results, attack_period_start, attack_period_end, html_report_path)
+  
+  generate_html_report(mpit_results, attack_period_start, attack_period_end, target, html_report_path)
   printl(f"{html_report_path} saved.", "info")
   webbrowser.open(html_report_path)

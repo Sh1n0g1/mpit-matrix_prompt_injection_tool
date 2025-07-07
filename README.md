@@ -18,13 +18,15 @@ It has 3 operational modes.
   - Visual charts for success/failure breakdowns
   - Real examples of successful and failed attack patterns
   - Check the sample report [here](samples/reports/MPIT%20Attack%20Report.pdf)
+## Requirements
+- OpenAI API Key (stored as OPENAI_API_KEY)
+- Python 3.x
 ## Setup
 * Run the following command
 ```
 git clone https://github.com/Sh1n0g1/mpit-matrix_prompt_injection_tool.git
-
+cd mpit-matrix_prompt_injection_tool
 pip install -r requirements.txt
-
 ```
 ## How to use
 ### TLDR
@@ -96,7 +98,6 @@ options:
     - Markdown (potential Markdown injection vulnerability)
 * If there is not Database, you can use `--no-sqli` to skip the SQL injection patterns
 * If there is no Code Execution, you can use `--no-rce`
-
 
 ## Edit the attack patterns
 The structure of the attack patterns
