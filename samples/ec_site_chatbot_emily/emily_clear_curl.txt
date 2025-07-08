@@ -1,0 +1,19 @@
+curl 'https://www.shinohack.me/shinollmapp/emily/clear' \
+  -X 'POST' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en-US,en;q=0.9,ja;q=0.8,zh-TW;q=0.7,zh;q=0.6' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Length: 0' \
+  -b 'session=.eJw1jUEKwjAQAP-y57BmKzUlz_ADIdRtWY1J7W4PRfy7RfA4w8C84cmqeeY0SWGIf9QThQ47Qo-UKPQ0hEP41C7X4bwHwbu2Cg5eW64mtkP0DtZcH1LntDQ1vkGcclF2YM1y-QVbFVtWGY8RYf_5AsaCKCs.aGtw6A.gOLCezZKqY6dVna3SG1arIGVJHo' \
+  -H 'Origin: https://www.shinohack.me' \
+  -H 'Pragma: no-cache' \
+  -H 'Referer: https://www.shinohack.me/shinollmapp/emily/chat' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+  -H 'X-Requested-With: XMLHttpRequest' \
+  -H 'sec-ch-ua: "Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "Windows"'

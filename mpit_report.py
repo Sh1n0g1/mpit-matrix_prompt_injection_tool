@@ -10,6 +10,12 @@ from jinja2 import Template
 from datetime import datetime
 from mpit_openai import get_openai_responses
 
+def truncate_and_escape(text, max_len=500):
+  if len(text) > max_len:
+    return html.escape(text[:max_len]) + "… <span style='color:gray'>(truncated)</span>"
+  else:
+    return html.escape(text)
+
 def generate_html_report(mpit_result, attack_period_start, attack_period_end, target, output_file="attack_report.html"):
   """
   Generates an HTML report from MPIT results.
@@ -23,13 +29,26 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
   df = pd.DataFrame(data)
 
   # 2. Data Analysis
-  summary_by_type = df.groupby("type")["attack_success"].value_counts().unstack().fillna(0)
+  summary_by_type = (
+    df.groupby("type")["attack_success"]
+      .value_counts()
+      .unstack()
+      .fillna(0)
+  )
+  
+  summary_by_type.columns = summary_by_type.columns.map(str)
+  # Ensure both True and False columns exist
+  for col in ['True', 'False']:
+    if col not in summary_by_type.columns:
+      summary_by_type[col] = 0
+  
+  summary_by_type = summary_by_type[['False', 'True']]
   summary_by_type.columns = ["Failure", "Success"]
   summary_by_type["Total"] = summary_by_type.sum(axis=1)
   summary_by_type["Success Rate (%)"] = (summary_by_type["Success"] / summary_by_type["Total"] * 100).round(1)
   type_order = ["rce", "sqli", "xss", "mdi", "prompt_leaking", "osr" ]
-  summary_by_type = summary_by_type.reindex(type_order)
-  
+  summary_by_type = summary_by_type.reindex(type_order).fillna(0)
+    
   start_str = attack_period_start.strftime("%Y-%m-%d %H:%M:%S")
   end_str = attack_period_end.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -118,6 +137,8 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     target_scope_html = "<i style='color: gray;'>No target defined</i>"
 
   # 3. Generate Charts with Dark Theme
+  ## Bar Chart
+  """
   bar_chart = px.bar(
     summary_by_type.reset_index(),
     x="type",
@@ -139,8 +160,49 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
   )
   
   bar_chart.update_yaxes(type="log")
+  bar_html = bar_chart.to_html(full_html=False, include_plotlyjs='cdn')
+  """
+  # Prepare data (already has success rate per type)
+  success_rate_chart_data = summary_by_type.reset_index()[["type", "Success Rate (%)"]].copy()
+  success_rate_chart_data.rename(columns={"Success Rate (%)": "Success (%)"}, inplace=True)
+  success_rate_chart_data["Failed (%)"] = 100 - success_rate_chart_data["Success (%)"]
 
+  # Melt to long format for stacked bars
+  melted = success_rate_chart_data.melt(
+      id_vars="type",
+      value_vars=["Success (%)", "Failed (%)"],
+      var_name="Result",
+      value_name="Percentage"
+  )
 
+  # Create vertical stacked bar chart
+  bar_chart = px.bar(
+      melted,
+      x="type",
+      y="Percentage",
+      color="Result",
+      title="Prompt Injection Success vs Failed Rate by Type",
+      barmode="stack",
+      template="plotly_dark",
+      color_discrete_map={
+          "Success (%)": "#FF4C4C",  # red
+          "Failed (%)": "#6C757D"    # gray
+      },
+      text_auto=True
+  )
+
+  # Styling
+  bar_chart.update_layout(
+      paper_bgcolor="#1e1e2f",
+      plot_bgcolor="#1e1e2f",
+      font=dict(color="#e0e0e0"),
+      yaxis=dict(range=[0, 100], title="Rate (%)"),
+      xaxis_title="Attack Type"
+  )
+
+  # Export as HTML snippet
+  bar_html = bar_chart.to_html(full_html=False, include_plotlyjs='cdn')
+  
   # Pie Chart
   color_discrete_map = {
     "osr": "#3498db",         # Soft Blue
@@ -168,6 +230,8 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     plot_bgcolor="#1e1e2f",
     font=dict(color="#e0e0e0")
   )
+  
+  pie_html = pie_chart.to_html(full_html=False, include_plotlyjs=False)
 
   severity_order = ["Critical", "High", "Medium", "Low"]
   severity_pie_chart = px.pie(
@@ -194,49 +258,56 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     font=dict(color="#e0e0e0")
   )
 
-
-  bar_html = bar_chart.to_html(full_html=False, include_plotlyjs='cdn')
-  pie_html = pie_chart.to_html(full_html=False, include_plotlyjs=False)
   severity_pie_html = severity_pie_chart.to_html(full_html=False, include_plotlyjs=False)
+
 
 
   # 4. Sample Patterns
   # Collect up to 3 successful patterns per type
-  sample_successes = (
-    df[df["attack_success"] == True]
-    .groupby("type", group_keys=False)
-    .apply(lambda g: g[["value", "responses"]].head(3).assign(type=g.name), include_groups=False)
-    .reset_index(drop=True)
-  )
-  sample_successes["type"] = pd.Categorical(
-    sample_successes["type"],
-    categories=type_order,
-    ordered=True
-  )
-  sample_successes = sample_successes.sort_values("type")
-  sample_successes["responses"] = sample_successes["responses"].apply(html.escape)
-  sample_successes["value"] = sample_successes["value"].apply(html.escape)
-  
+  success_df = df[df["attack_success"] == True]
+  if success_df.empty:
+    sample_successes = pd.DataFrame(columns=["type", "value", "responses"])
+  else:
+    sample_successes = (
+      success_df
+      .groupby("type", group_keys=False)
+      .apply(lambda g: g[["value", "responses"]].head(3).assign(type=g.name), include_groups=False)
+      .reset_index(drop=True)
+    )
+    sample_successes["type"] = pd.Categorical(
+      sample_successes["type"],
+      categories=type_order,
+      ordered=True
+    )
+    sample_successes = sample_successes.sort_values("type")
+    sample_successes["responses"] = sample_successes["responses"].apply(truncate_and_escape)
+    sample_successes["value"] = sample_successes["value"].apply(lambda x: truncate_and_escape(x, max_len=1000))
 
   # Collect a failed patterns per type
-  sample_failed = (
-    df[df["attack_success"] == False]
-    .groupby("type", group_keys=False)
-    .apply(lambda g: g[["value", "responses"]].head(1).assign(type=g.name), include_groups=False)
-    .reset_index(drop=True)
-  )
-  sample_failed["type"] = pd.Categorical(
-    sample_failed["type"],
-    categories=type_order,
-    ordered=True
-  )
-  sample_failed = sample_failed.sort_values("type")
-  sample_failed["responses"] = sample_failed["responses"].apply(html.escape)
-  sample_failed["value"] = sample_failed["value"].apply(html.escape)
+  failed_df = df[df["attack_success"] == False]
 
+  if failed_df.empty:
+    sample_failed = pd.DataFrame(columns=["type", "value", "responses"])
+  else:
+    sample_failed = (
+      failed_df
+      .groupby("type", group_keys=False)
+      .apply(lambda g: g[["value", "responses"]].head(3).assign(type=g.name), include_groups=False)
+      .reset_index(drop=True)
+    )
+
+    sample_failed["type"] = pd.Categorical(
+      sample_failed["type"],
+      categories=type_order,
+      ordered=True
+    )
+    sample_failed = sample_failed.sort_values("type")
+
+    # Escape HTML
+    sample_failed["responses"] = sample_failed["responses"].apply(truncate_and_escape)
+    sample_failed["value"] = sample_failed["value"].apply(lambda x: truncate_and_escape(x, max_len=1000))
 
   # 5. Render HTML
-    
   with open("report_template.html", "r", encoding="utf-8") as f:
     html_template = f.read()
   template = Template(html_template)
@@ -265,6 +336,7 @@ if __name__ == "__main__":
   
   # Test the report generation
   filename="samples/reports/mpit_results.json"
+  filename="reports/2025-07-08_162132/mpit_results.json"
   with open(filename, "r", encoding="utf-8") as f:
     mpit_result = json.load(f)
   with open("samples/reports/system_prompt.txt", "r", encoding="utf-8") as f:

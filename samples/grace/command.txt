@@ -1,0 +1,1 @@
+python mpit.py A --target-url https://www.shinohack.me/shinollmapp/grace/chat.php --target-curl-file samples/grace/curl.txt --score-filter 10 --attempt-per-attack 1 

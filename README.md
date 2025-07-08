@@ -43,9 +43,10 @@ pip install -r requirements.txt
   * [A]ttack the LLM App (URL required)
   * [S]imulate the LLM App (system prompt required)
 ```
-usage: mpit.py [-h] [--target-url TARGET_URL] [--target-curl-file TARGET_CURL_FILE] [--system-prompt-file SYSTEM_PROMPT_FILE] [--model MODEL]
-               [--temperature TEMPERATURE] [--attempt-per-attack ATTEMPT_PER_ATTACK] [--prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS] [--no-mdi]
-               [--no-prompt-leaking] [--no-osr] [--no-xss] [--no-rce] [--no-sqli] [--dump-all-attack] [--score-filter SCORE_FILTER]
+usage: mpit.py [-h] [--target-url TARGET_URL] [--target-curl-file TARGET_CURL_FILE] [--target-clear-curl-file TARGET_CLEAR_CURL_FILE]
+               [--system-prompt-file SYSTEM_PROMPT_FILE] [--model MODEL] [--temperature TEMPERATURE] [--attempt-per-attack ATTEMPT_PER_ATTACK]
+               [--prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS] [--no-mdi] [--no-prompt-leaking] [--no-osr] [--no-xss] [--no-rce] [--no-sqli]
+               [--dump-all-attack] [--score-filter SCORE_FILTER]
                {G,A,S}
 
 The Matrix Prompt Injection Tool (MPIT) - Generate, Simulate or Attack prompt injection attacks.
@@ -59,6 +60,8 @@ options:
                         A:Target base URL for Attack mode.
   --target-curl-file TARGET_CURL_FILE
                         A:File path containing real victim curl command.
+  --target-clear-curl-file TARGET_CLEAR_CURL_FILE
+                        A:File path containing clear conversation curl command to reset the conversation state.
   --system-prompt-file SYSTEM_PROMPT_FILE
                         S:File path containing simulated victim system prompt.
   --model MODEL         S:Model to use for simulation (default: gpt-4.1-nano).
@@ -81,10 +84,10 @@ options:
     Examples:
       G Mode (Generate): python mpit.py G --score-filter 8.0 --no-rce
       S Mode (Simulate): python mpit.py S --system-prompt-file samples/systemprompt.txt --prompt-leaking-keywords "SunsetVoyager#3971"
-                                          --attempt-per-attack 1 --score-filter 10 --no-sqli --no-rce
+                                          --attempt-per-attack 3 --score-filter 10 --no-sqli --no-rce
       A Mode (Attack):   python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/
                                           --target-curl-file samples/bella_curl.txt
-                                          --attempt-per-attack 1 --score-filter 10 --prompt-leaking-keywords "41_4551574n4"
+                                          --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
 ```
 
 ### Preparation
