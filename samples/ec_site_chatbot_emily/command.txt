@@ -1,0 +1,1 @@
+python mpit.py A --target-url https://www.shinohack.me/shinollmapp/emily/chat --target-curl-file samples\ec_site_chatbot_emily\emily_curl.txt --score-filter 10 --attempt-per-attack 1 
