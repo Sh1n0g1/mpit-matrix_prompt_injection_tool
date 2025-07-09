@@ -1,0 +1,1 @@
+python mpit.py S --system-prompt-file .\samples\travel_agency_prompt\systemprompt.txt

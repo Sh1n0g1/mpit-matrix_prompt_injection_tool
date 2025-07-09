@@ -1,3 +1,14 @@
+# Bella - Simple Q&A
+## Description
+A simple generic Q&A response.
+![Bella](images/bella_simple_q_and_a.png)
+
+## CLI
+![Bella MPIT Atack](images/bella_cli.png)
+## Report
+[mpit_report.pdf](samples\bella_generic_ai_assistant\mpit_report.pdf)
+
+
 # Emily - EC chatbot
 ## Preparation
 ### Prepare the target curl file

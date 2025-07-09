@@ -1,0 +1,19 @@
+{
+  "commandline": "python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/ --target-curl-file samples/bella_generic_ai_assistant/bella_curl.txt --prompt-leaking-keywords 4551574n4 --no-rce --no-sqli",
+  "mode": "A",
+  "target_url": "https://www.shinohack.me/shinollmapp/bella/",
+  "target_curl_file": "samples/bella_generic_ai_assistant/bella_curl.txt ",
+  "system_prompt_file": null,
+  "temperature": 1,
+  "attempt_per_attack": 1,
+  "prompt_leaking_keywords": "4551574n4",
+  "no_mdi": false,
+  "no_prompt_leaking": false,
+  "no_osr": false,
+  "no_xss": false,
+  "no_rce": true,
+  "no_sqli": true,
+  "score_filter": 10,
+  "log_file": "logs\\2025-07-08 202358.log",
+  "dump_all_attack": false
+}

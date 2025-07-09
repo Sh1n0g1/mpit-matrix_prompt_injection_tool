@@ -179,6 +179,7 @@
     <div class="chart" id="severity_distribution">{{ severity_pie_plot | safe }}</div>
     <div class="chart" id="attack_success_rate">{{ bar_plot | safe }}</div>
     <div class="chart" id="type_distribution">{{ pie_plot | safe }}</div>
+    <div class="chart" id="type_distribution">{{ treemap_html | safe }}</div>
     <div class="page-break"></div>
     <h2>Sample Successful Patterns</h2>
     {% if success_samples %}

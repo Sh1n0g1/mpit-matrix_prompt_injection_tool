@@ -80,7 +80,7 @@ def print_logo():
     Print the MPIT logo to the console.
     """
     print("")
-    print("The Matrix Prompt Injection Tool".center(80, "="))
+    print(" The Matrix Prompt Injection Tool ".center(80, "="))
     print("")
     print(random.choice(logo))
     print("=" * 80)

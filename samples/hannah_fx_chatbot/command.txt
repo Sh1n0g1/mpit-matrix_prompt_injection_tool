@@ -1,0 +1,1 @@
+python mpit.py A --target-url https://www.shinohack.me/shinollmapp/hannah/chat --target-curl-file "samples\hannah_fx_chatbot\curl.txt"

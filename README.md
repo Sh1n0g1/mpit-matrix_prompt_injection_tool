@@ -19,7 +19,8 @@ It has 3 operational modes.
   - Real examples of successful and failed attack patterns
   - Check the sample report [here](samples/reports/MPIT%20Attack%20Report.pdf)
 ## Requirements
-- OpenAI API Key (stored as OPENAI_API_KEY)
+- OpenAI API Key
+  - [Use Environment Variables in place of your API key](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety#h_a1ab3ba7b2)
 - Python 3.x
 ## Setup
 * Run the following command
@@ -32,7 +33,7 @@ pip install -r requirements.txt
 ### TLDR
 1. Prepare your system prompt, e.g.) system_prompt.txt
 2. Run this command
-`python mpit.py S --system-prompt-file system_prompt.txt --prompt-leaking-keywords "SunsetVoyager#3971" --attempt-per-attack 1 --temperature 1 --score-filter 10
+`python mpit.py S --system-prompt-file system_prompt.txt`
 3. You will get a nice HTML report (can be print in PDF by the browser)
 4. All data will be under the reports directory
 5. This is the "[S]imulation mode"
@@ -89,22 +90,41 @@ options:
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
 ```
-
 ### Preparation
-
 #### What attack can be skipped ?
 * Perform observation to understand how the LLM output is handled.
   - Ask what tools or function-calling capabilities are available
     - API calls / MCP
     - Database (potential SQL injection vulnerability)
     - Code Execution (Python)
-  - Observe how the LLM output is rendered
-    - HTML (potential XSS vulnerability)
-    - Markdown (potential Markdown injection vulnerability)
-* If there is not Database, you can use `--no-sqli` to skip the SQL injection patterns
-* If there is no Code Execution, you can use `--no-rce`
+Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or surfaces exposed:
 
-## Edit the attack patterns
+Investigate the environment and interfaces:
+
+Ask the LLM what tools or functions are available:
+
+API access (e.g., MCP or plugin interfaces)
+
+Database interaction (potential for SQL injection)
+
+Code execution (e.g., Python or system commands)
+
+Understand how LLM responses are rendered:
+
+HTML rendering: May expose XSS vulnerabilities
+
+Markdown rendering: May allow Markdown Injection
+
+⏭️ Skipping Irrelevant Attack Types
+Once you've identified the exposed capabilities, you can streamline testing by skipping unsupported attack types:
+
+Use --no-sqli if no database interaction is present.
+
+Use --no-rce if code execution is not supported.
+
+
+## How to Edit the attack patterns
+
 The structure of the attack patterns
 You can think of the traditional exploits. We have the exploit code and shellcode.
 * the exploit code is responsible to trigger the vulnerability and execute the shellcode

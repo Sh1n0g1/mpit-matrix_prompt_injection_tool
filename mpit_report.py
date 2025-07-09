@@ -260,6 +260,34 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
 
   severity_pie_html = severity_pie_chart.to_html(full_html=False, include_plotlyjs=False)
 
+  ## Chart4
+  # Group by pattern text (value) and type
+  pattern_stats = (
+    df.groupby(["type", "value"])["attack_success"]
+      .agg([("Total", "count"), ("Success", "sum")])
+      .reset_index()
+  )
+  
+  # Compute success rate
+  pattern_stats["Success Rate"] = (pattern_stats["Success"] / pattern_stats["Total"] * 100).round(1)
+
+  treemap = px.treemap(
+    pattern_stats,
+    path=["type", "value"],
+    values="Total",
+    color="Success Rate",
+    color_continuous_scale="Reds",  # Reverse success scale: red = high success
+    title="Attack Prompt Patterns and Their Effectiveness by Type",
+    template="plotly_dark"
+  )
+
+  treemap.update_layout(
+    paper_bgcolor="#1e1e2f",
+    plot_bgcolor="#1e1e2f",
+    font=dict(color="#e0e0e0")
+  )
+
+  treemap_html = treemap.to_html(full_html=False, include_plotlyjs=False)
 
 
   # 4. Sample Patterns
@@ -323,6 +351,7 @@ def generate_html_report(mpit_result, attack_period_start, attack_period_end, ta
     bar_plot=bar_html,
     pie_plot=pie_html,
     severity_pie_plot=severity_pie_html,
+    treemap_html = treemap_html,
     success_samples=sample_successes.to_dict(orient="records"),
     failed_samples=sample_failed.to_dict(orient="records"),
     year=datetime.now().year,
@@ -336,7 +365,7 @@ if __name__ == "__main__":
   
   # Test the report generation
   filename="samples/reports/mpit_results.json"
-  filename="reports/2025-07-08_162132/mpit_results.json"
+  filename="reports/2025-07-09_091851/mpit_results.json"
   with open(filename, "r", encoding="utf-8") as f:
     mpit_result = json.load(f)
   with open("samples/reports/system_prompt.txt", "r", encoding="utf-8") as f:
