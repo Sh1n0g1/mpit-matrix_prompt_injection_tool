@@ -42,7 +42,7 @@ def get_openai_responses(
 
 # Example usage
 if __name__ == "__main__":
-  with open("sample_input/systemprompt.txt", "r") as file:
+  with open("samples/reports/system_prompt.txt", "r") as file:
     system_prompt = file.read().strip()
   messages = [
     {"role": "system", "content": system_prompt},

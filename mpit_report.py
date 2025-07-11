@@ -365,7 +365,7 @@ if __name__ == "__main__":
   
   # Test the report generation
   filename="samples/reports/mpit_results.json"
-  filename="reports/2025-07-09_091851/mpit_results.json"
+  #filename="reports/2025-07-09_091851/mpit_results.json"
   with open(filename, "r", encoding="utf-8") as f:
     mpit_result = json.load(f)
   with open("samples/reports/system_prompt.txt", "r", encoding="utf-8") as f:
