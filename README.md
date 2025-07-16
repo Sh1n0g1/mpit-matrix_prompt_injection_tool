@@ -43,6 +43,17 @@ pip install -r requirements.txt
   * [G]enerate Attack Pattern
   * [A]ttack the LLM App (URL required)
   * [S]imulate the LLM App (system prompt required)
+
+| Category             | [G] Generate                                  | [A] Attack                                                                  | [S] Simulate                                                                  |
+|----------------------|-----------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| **Purpose**          | Generate prompt injection attack patterns     | Execute attacks on a real LLM web application                              | Simulate LLM behavior locally to test prompt injection                        |
+| **Requirement**      | None                                          | - Target URL or curl command<br>- (Optional) clear context curl<br>- Keywords | - System prompt<br>- (Optional) model and temperature<br>- Keywords           |
+| **Attack to System** | ✘ Does not contact any external system        | ✅ Sends real requests to target LLM app                                    | ✘ Only simulates responses locally                                            |
+| **Report Output**    | ✘                                             | ✅                                                                          | ✅                                                                             |
+| **Use Case**         | Generate attack vectors to test with later    | Evaluate real system’s resilience to live prompt injection                 | Analyze how your system prompt would respond to attacks pre-deployment       |
+
+
+
 ```
 usage: mpit.py [-h] [--target-url TARGET_URL] [--target-curl-file TARGET_CURL_FILE] [--target-clear-curl-file TARGET_CLEAR_CURL_FILE]
                [--system-prompt-file SYSTEM_PROMPT_FILE] [--model MODEL] [--temperature TEMPERATURE] [--attempt-per-attack ATTEMPT_PER_ATTACK]
@@ -95,22 +106,26 @@ options:
 * Run `python misc/command_builder.py` or `python misc\\command_builder.py` for Windows.
 
 ### Preparation
-1. Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or surfaces exposed:
-2. Investigate the environment and interfaces:
-3. Ask the LLM what tools or functions are available:
+#### Reconnaissance
+Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or exposed surfaces.
+1. Ask the LLM what tools or functions are available, such as:
     - API access (e.g., MCP or plugin interfaces) 
-    - Database interaction (potential for SQL injection) -> SQLi
+    - Database interaction -> SQLi
     - Code execution (e.g., Python or system commands) -> RCE
-4. Understand how LLM responses are rendered:
+2. Understand how LLM responses are rendered:
     - HTML rendering: May expose XSS vulnerabilities -> XSS
     - Markdown rendering: May allow Markdown Injection -> Markdown Injection
 
-Once you know the possible attack, you can get rid of the others by specifying the following.
+Once you’ve identified the possible attack vectors, you can disable the irrelevant ones using the following options:
 * --no-rce
 * --no-sqli
 * --no-xss
 * --no-mdi
 
+#### Mode Selection
+1. If you have the system prompt and the system does not have either database integration nor code execution, you can use *S*imulate
+2. If you want to perform the attack against the system, you can use *A*ttack mode.
+3. If the webapp is too complicated (authentication, websocket), use *G*enerate mode to get the attack pattern so that you can use them to use by yourself.
 
 
 ## How to Edit the attack patterns
