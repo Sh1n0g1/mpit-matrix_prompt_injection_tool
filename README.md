@@ -95,36 +95,22 @@ options:
 * Run `python misc/command_builder.py` or `python misc\\command_builder.py` for Windows.
 
 ### Preparation
-#### What attack can be skipped ?
-* Perform observation to understand how the LLM output is handled.
-  - Ask what tools or function-calling capabilities are available
-    - API calls / MCP
-    - Database (potential SQL injection vulnerability)
-    - Code Execution (Python)
-Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or surfaces exposed:
+1. Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or surfaces exposed:
+2. Investigate the environment and interfaces:
+3. Ask the LLM what tools or functions are available:
+  - API access (e.g., MCP or plugin interfaces) 
+  - Database interaction (potential for SQL injection) -> SQLi
+  - Code execution (e.g., Python or system commands) -> RCE
+4. Understand how LLM responses are rendered:
+  - HTML rendering: May expose XSS vulnerabilities -> XSS
+  - Markdown rendering: May allow Markdown Injection -> Markdown Injection
 
-Investigate the environment and interfaces:
+Once you know the possible attack, you can get rid of the others by specifying the following.
+--no-rce
+--no-sqli
+--no-xss
+--no-mdi
 
-Ask the LLM what tools or functions are available:
-
-API access (e.g., MCP or plugin interfaces)
-
-Database interaction (potential for SQL injection)
-
-Code execution (e.g., Python or system commands)
-
-Understand how LLM responses are rendered:
-
-HTML rendering: May expose XSS vulnerabilities
-
-Markdown rendering: May allow Markdown Injection
-
-⏭️ Skipping Irrelevant Attack Types
-Once you've identified the exposed capabilities, you can streamline testing by skipping unsupported attack types:
-
-Use --no-sqli if no database interaction is present.
-
-Use --no-rce if code execution is not supported.
 
 
 ## How to Edit the attack patterns
