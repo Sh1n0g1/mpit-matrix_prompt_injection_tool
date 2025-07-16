@@ -98,18 +98,18 @@ options:
 1. Before launching attacks, first observe how the LLM output is processed and identify the relevant capabilities or surfaces exposed:
 2. Investigate the environment and interfaces:
 3. Ask the LLM what tools or functions are available:
-  - API access (e.g., MCP or plugin interfaces) 
-  - Database interaction (potential for SQL injection) -> SQLi
-  - Code execution (e.g., Python or system commands) -> RCE
+    - API access (e.g., MCP or plugin interfaces) 
+    - Database interaction (potential for SQL injection) -> SQLi
+    - Code execution (e.g., Python or system commands) -> RCE
 4. Understand how LLM responses are rendered:
-  - HTML rendering: May expose XSS vulnerabilities -> XSS
-  - Markdown rendering: May allow Markdown Injection -> Markdown Injection
+    - HTML rendering: May expose XSS vulnerabilities -> XSS
+    - Markdown rendering: May allow Markdown Injection -> Markdown Injection
 
 Once you know the possible attack, you can get rid of the others by specifying the following.
---no-rce
---no-sqli
---no-xss
---no-mdi
+* --no-rce
+* --no-sqli
+* --no-xss
+* --no-mdi
 
 
 
