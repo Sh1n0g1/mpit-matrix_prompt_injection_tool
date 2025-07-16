@@ -102,9 +102,23 @@ options:
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
 ```
-### Hard to build the command line?
-* There is a command builder in `misc` directory.
-* Run `python misc/command_builder.py` or `python misc\\command_builder.py` for Windows.
+### Having trouble building the command line?
+
+Don't worry — we've included an interactive **Command Builder** to help you construct the correct command for your use case.
+
+📍 You can find it in the `misc/` directory.
+
+🖥️ To launch it:
+- On **Unix/macOS**:
+  ```bash
+  python misc/command_builder.py
+  ```
+- On **Windows**:
+  ```cmd
+  python misc\\command_builder.py
+  ```
+
+This tool will guide you step-by-step to create a valid MPIT command based on your selected mode and options.
 
 ### Preparation
 #### Reconnaissance
