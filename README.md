@@ -90,6 +90,10 @@ options:
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
 ```
+### Hard to build the command line?
+* There is a command builder in `misc` directory.
+* Run `python misc/command_builder.py` or `python misc\\command_builder.py` for Windows.
+
 ### Preparation
 #### What attack can be skipped ?
 * Perform observation to understand how the LLM output is handled.
