@@ -364,6 +364,12 @@ def parse_args():
       help="I:Comma-separated seed type target counts, e.g. delimiter=10,exploit=20,new_instruction_xss=3,new_instruction_xss.reason=4"
   )
   parser.add_argument("--attempt-per-test", type=int, default=10, help="I: Number of attempts per attack in Improve mode (default: 10)")
+  parser.add_argument("--derivation-ratio", type=float, default=0.5,
+                      help="I: Probability of each generated seed deriving from an existing seed (default: 0.5)")
+  parser.add_argument(
+      "--score-moving-average-window", type=int, default=5,
+      help="I: Moving average window size for score calculation (default: 5)"
+  )
 
   # Attack and Simulate mode common parameters
   parser.add_argument("--attempt-per-attack", type=int, default=1, help="AS: Number of attempts per attack in Attack and Simulate modes (default: 1)")

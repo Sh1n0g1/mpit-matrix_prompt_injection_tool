@@ -6,7 +6,7 @@ def get_openai_responses(
     n=1,
     model:str="gpt-4.1-nano",
     temperature:float=1.0,
-    seed:int=42,
+    seed:int=None,
   ) -> 'list[str] | None':
   
   """

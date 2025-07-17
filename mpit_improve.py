@@ -3,6 +3,7 @@ import sys
 import json
 import math
 import random
+import numpy as np
 from copy import deepcopy
 from nanoid import generate as nanoid
 from datetime import datetime
@@ -144,7 +145,7 @@ TARGET_COUNTS = {
     "repeat_reason": 4,
     "repeat_verb": 3,
     "delimiter": 8,
-    "exploit": 16,
+    "exploit": 20,
     "new_instruction_mdi": 1,
     "new_instruction_osr": 1,
     "new_instruction_rce": 1,
@@ -177,7 +178,7 @@ PL_SEED_TYPES = [
     "repeat_reason", "repeat_verb"
 ]
 
-random.seed(42)
+# random.seed(42)
 
 def parse_target_counts(arg_value):
     """Parses --target-seed-counts argument and returns a dict of overrides"""
@@ -230,6 +231,15 @@ def run_improve_mode(args, report_dir):
     if args.attempt_per_test < 1:
         printl("Attempt per test must be at least 1.", "error")
         sys.exit(1)
+    if args.score_moving_average_window < 1:
+        printl("Score moving average window must be at least 1.", "error")
+        sys.exit(1)
+    if args.derivation_ratio < 0 or args.derivation_ratio > 1:
+        printl("Derivation ratio must be between 0 and 1.", "error")
+        sys.exit(1)
+
+    derivation_ratio = args.derivation_ratio
+    score_ma_window = args.score_moving_average_window
 
     excluded = set(args.exclude_seed_types.split(",")) if args.exclude_seed_types else set()
 
@@ -242,7 +252,7 @@ def run_improve_mode(args, report_dir):
         "new_instruction_xss": args.no_xss,
         "new_instruction_mdi": args.no_mdi,
         "new_instruction_osr": args.no_osr,
-        "new_instruction_prompt_leaking": args.no_prompt_leaking
+        # "new_instruction_prompt_leaking": args.no_prompt_leaking
     }
 
     for seed_type, is_disabled in disabled_map.items():
@@ -285,7 +295,7 @@ def run_improve_mode(args, report_dir):
 
     # 4. Combine into possible patterns (no filtering!)
     printl("Combining patterns with minimal context for improvement evaluation...", "info")
-    attack_patterns = combine_patterns_minimal(pattern_seeds, excluded_types=args.exclude_seed_types.split(","), disabled_map=disabled_map, debug=True)
+    attack_patterns = combine_patterns_minimal(pattern_seeds, excluded_types=args.exclude_seed_types.split(","), disabled_map=disabled_map, debug=True, score_ma_window=score_ma_window)
     printl(f"Total attack patterns generated: {len(attack_patterns)}", "info")
     
     # dump attack patterns for debugging
@@ -310,7 +320,7 @@ def run_improve_mode(args, report_dir):
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TextColumn("Processed: [cyan]{task.completed}/{task.total}"),
-        TextColumn("• Success: [green]{task.fields[success]}/" + str(len(attack_patterns) * attempt_per_test)),
+        TextColumn("• Success: [green]{task.fields[success]} [/green]•"),
         TimeRemainingColumn(),
     ) as progress:
         task = progress.add_task(
@@ -332,7 +342,7 @@ def run_improve_mode(args, report_dir):
                     "type": pattern["type"],
                     "name": pattern["name"],
                     "value": pattern["value"],
-                    "seed_names": extract_seed_names_from_pattern(pattern),
+                    "seed_names": pattern["seed_names"],
                     "reason_name": extract_reason_name_from_pattern(pattern),
                     "responses": response,
                     "attack_success": attack_results[i],
@@ -342,6 +352,10 @@ def run_improve_mode(args, report_dir):
                     success_count += 1
             progress.update(task, advance=attempt_per_test, success=success_count)
 
+    # dump mpit results for debugging
+    mpit_results_dump_path = os.path.join(report_dir, "mpit_results.json")
+    with open(mpit_results_dump_path, "w", encoding="utf-8") as f:
+        json.dump(mpit_results, f, indent=2, ensure_ascii=False)
 
     # 6. Detect prompt leaking by response length, as in S mode
     from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
@@ -374,6 +388,10 @@ def run_improve_mode(args, report_dir):
             printl(f"Seed type {seed_type} is excluded from improvement.", "info")
             improved_seeds[seed_type] = load_seeds(seed_type)
             continue
+        if seed_type in PL_SEED_TYPES and args.no_prompt_leaking:
+            printl(f"Seed type {seed_type} is excluded from improvement because --no-prompt-leaking is set.", "info")
+            improved_seeds[seed_type] = load_seeds(seed_type)
+            continue
         target_count = get_target_count(seed_type, target_overrides, TARGET_COUNTS)
         improved_seeds[seed_type], improvement_report[seed_type] = improve_normal_seed_type(
             seed_type,
@@ -381,7 +399,9 @@ def run_improve_mode(args, report_dir):
             load_seeds(seed_type),
             args.survival_rate_threshold,
             args.survival_ratio_threshold,
-            target_count
+            target_count,
+            derivation_ratio,
+            score_ma_window
         )
 
     for ni_type in NEW_INSTRUCTION_TYPES:
@@ -389,10 +409,14 @@ def run_improve_mode(args, report_dir):
             printl(f"Seed type {ni_type} is excluded from improvement.", "info")
             improved_seeds[ni_type] = load_seeds(ni_type)
             continue
+        if disabled_map[ni_type]:
+            printl(f"Seed type {ni_type} is disabled by --no-* flag.", "info")
+            improved_seeds[ni_type] = load_seeds(ni_type)
+            continue
         ni_target = get_target_count(ni_type, target_overrides, TARGET_COUNTS)
         ni_seeds = load_seeds(ni_type)
         ni_survivors, ni_report = improve_new_instruction_seeds(
-            ni_type, mpit_results, ni_seeds, args.survival_rate_threshold, args.survival_ratio_threshold, ni_target
+            ni_type, mpit_results, ni_seeds, args.survival_rate_threshold, args.survival_ratio_threshold, ni_target, derivation_ratio, score_ma_window
         )
         improved_ni_seeds = []
         ni_reason_report = {}
@@ -404,7 +428,7 @@ def run_improve_mode(args, report_dir):
             reason_target = get_target_count(ni_type, target_overrides, TARGET_COUNTS, is_reason=True)
             final_reasons, reason_report = improve_reason_seeds(
                 ni_type, instr_name, instr_value, mpit_results, old_reasons, reason_target,
-                args.survival_rate_threshold, args.survival_ratio_threshold
+                args.survival_rate_threshold, args.survival_ratio_threshold, derivation_ratio, score_ma_window
             )
             improved = deepcopy(instr)
             improved["reason"] = final_reasons
@@ -436,7 +460,7 @@ def run_improve_mode(args, report_dir):
     printl("==== MPIT Improve Mode Complete ====", "info")
 
 def extract_seed_names_from_pattern(pattern):
-    return pattern["name"].split("_") if "name" in pattern else []
+    return pattern["name"].replace("~", " ").replace("_", " ").split() if "name" in pattern else []
 
 def extract_reason_name_from_pattern(pattern):
     return pattern["reason"]["name"]
@@ -449,43 +473,44 @@ def load_seeds(seed_type):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count):
+def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
     usage = Counter()
     success = Counter()
-    for result in mpit_results:
-        for sname in result["seed_names"]:
-            if sname == seed_type or sname.startswith(seed_type):
-                usage[sname] += 1
-                if result["attack_success"]:
-                    success[sname] += 1
-    seed_rates = {}
     for s in seeds:
-        name = s["name"]
-        seed_rates[name] = success[name]/usage[name] if usage[name] > 0 else 0.0
+        for result in mpit_results:
+            if seed_type in result["seed_names"].keys() and s["name"] == result["seed_names"][seed_type]:
+                usage[s["name"]] += 1
+                if result["attack_success"]:
+                    success[s["name"]] += 1
+    seed_rates = {}
 
+    for s in seeds:
+            name = s["name"]
+            seed_rates[name] = s["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
-    by_rate = [name for name, rate in items if rate * 10 >= rate_threshold]
-    sorted_items = sorted(items, key=lambda x: x[1], reverse=True)
+    by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
+    sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
+
     count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [s for s in seeds if s["name"] in survivors_set]
     if len(survivors) > target_count:
-        survivors = trim_to_target(survivors, seed_rates, target_count)
+        survivors = trim_to_target(survivors, seed_rates, target_count, score_ma_window)
     n_to_add = target_count - len(survivors)
     derived, created = [], []
     if n_to_add > 0:
         survivor_names = [s["name"] for s in survivors]
-        for _ in range(random.randint(0, n_to_add)):
+        for _ in range(round(np.random.binomial(n_to_add, derivation_ratio))):
             if survivors:
                 src = random.choice(survivors)
                 derived.append(generate_derived_seed(seed_type, src))
         while len(survivors) + len(derived) + len(created) < target_count:
             created.append(generate_created_seed(seed_type))
     for s in survivors:
-        s["score"] = [float(seed_rates[s["name"]] * 10)]
+        s["score"].append(seed_rates[s["name"]][-1])
     for s in derived + created:
-        s["score"] = [0.0]
+        s["score"] = []
     seed_ranking = sorted(items, key=lambda x: x[1], reverse=True)
     report = {
         "ranking": seed_ranking,
@@ -495,41 +520,40 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, rat
     }
     return survivors + derived + created, report
 
-def improve_new_instruction_seeds(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count):
+def improve_new_instruction_seeds(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
     usage = Counter()
     success = Counter()
     for result in mpit_results:
-        for sname in result["seed_names"]:
-            if sname == seed_type or sname.startswith(seed_type):
-                usage[sname] += 1
-                if result["attack_success"]:
-                    success[sname] += 1
+        if seed_type in result["seed_names"].keys() and s["name"] == result["seed_names"][seed_type]:
+            usage[s["name"]] += 1
+            if result["attack_success"]:
+                success[s["name"]] += 1
     seed_rates = {}
     for s in seeds:
-        name = s["name"]
-        seed_rates[name] = success[name]/usage[name] if usage[name] > 0 else 0.0
+            name = s["name"]
+            seed_rates[name] = s["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
-    by_rate = [name for name, rate in items if rate * 10 >= rate_threshold]
-    sorted_items = sorted(items, key=lambda x: x[1], reverse=True)
+    by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
+    sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
     count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [s for s in seeds if s["name"] in survivors_set]
     if len(survivors) > target_count:
-        survivors = trim_to_target(survivors, seed_rates, target_count)
+        survivors = trim_to_target(survivors, seed_rates, target_count, score_ma_window)
     n_to_add = target_count - len(survivors)
     derived, created = [], []
     if n_to_add > 0:
-        for _ in range(random.randint(0, n_to_add)):
+        for _ in range(round(n_to_add, derivation_ratio)):
             if survivors:
                 src = random.choice(survivors)
                 derived.append(generate_derived_instruction_seed(seed_type, src))
         while len(survivors) + len(derived) + len(created) < target_count:
             created.append(generate_created_instruction_seed(seed_type))
     for s in survivors:
-        s["score"] = [float(seed_rates[s["name"]] * 10)]
+        s["score"].append(seed_rates[s["name"]][-1])
     for s in derived + created:
-        s["score"] = [0.0]
+        s["score"] = []
     seed_ranking = sorted(items, key=lambda x: x[1], reverse=True)
     report = {
         "ranking": seed_ranking,
@@ -539,7 +563,21 @@ def improve_new_instruction_seeds(seed_type, mpit_results, seeds, rate_threshold
     }
     return survivors + derived + created, report
 
-def improve_reason_seeds(parent_type, parent_name, parent_value, mpit_results, reasons, target_count, rate_threshold, ratio_threshold):
+def improve_reason_seeds(
+    parent_type, parent_name, parent_value,
+    mpit_results, reasons, target_count,
+    rate_threshold, ratio_threshold,
+    derivation_share, score_ma_window
+):
+    """
+    Evaluates, trims, and replenishes reasons for a new_instruction seed.
+    - survivors: those that meet success/rank criteria and trimmed to target_count
+    - new ones: derived from survivors or created from scratch (LLM)
+    Returns: ([new reasons...], report dict)
+    """
+    from collections import Counter
+    import math, random
+
     usage, success = Counter(), Counter()
     for result in mpit_results:
         rname = result.get("reason_name")
@@ -548,25 +586,46 @@ def improve_reason_seeds(parent_type, parent_name, parent_value, mpit_results, r
             success[rname] += 1
     seed_rates = {}
     for r in reasons:
-        name = r["name"]
-        seed_rates[name] = success[name]/usage[name] if usage[name] > 0 else 0.0
+            name = r["name"]
+            seed_rates[name] = r["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
-    by_rate = [name for name, rate in items if rate * 10 >= rate_threshold]
-    sorted_items = sorted(items, key=lambda x: x[1], reverse=True)
+    by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
+    sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
     count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [r for r in reasons if r["name"] in survivors_set]
     if len(survivors) > target_count:
-        survivors = trim_to_target(survivors, seed_rates, target_count)
-    new_reasons = []
+        survivors = trim_to_target(survivors, seed_rates, target_count, score_ma_window)
     n_to_add = target_count - len(survivors)
-    for _ in range(n_to_add):
-        new_reasons.append(generate_created_reason_seed(parent_type, {"name": parent_name, "value": parent_value}))
+
+    # Split new reason slots between derivation and creation (can be random or alternate)
+    new_reasons = []
+    n_derive = round(np.random.binomial(n_to_add, derivation_share))
+    n_create = n_to_add - n_derive
+    survivors_for_derivation = survivors[:] if survivors else reasons
+    # Randomly sample survivors for derivation, allowing duplicates if needed
+    for _ in range(n_derive):
+        if survivors_for_derivation:
+            base = random.choice(survivors_for_derivation)
+        elif reasons:
+            base = random.choice(reasons)
+        else:
+            break
+        new_reasons.append(
+            generate_derived_reason_seed(parent_type, {"name": parent_name, "value": parent_value}, base)
+        )
+    # Fill the rest with created (from scratch)
+    for _ in range(n_create):
+        new_reasons.append(
+            generate_created_reason_seed(parent_type, {"name": parent_name, "value": parent_value})
+        )
+
+    # Update scores (append success rate*10)
     for r in survivors:
-        r["score"] = [float(seed_rates[r["name"]] * 10)]
+        r["score"].append(seed_rates[r["name"]][-1])
     for r in new_reasons:
-        r["score"] = [0.0]
+        r["score"] = []
     ranking = sorted(items, key=lambda x: x[1], reverse=True)
     report = {
         "ranking": ranking,
@@ -575,10 +634,22 @@ def improve_reason_seeds(parent_type, parent_name, parent_value, mpit_results, r
     }
     return survivors + new_reasons, report
 
-def trim_to_target(seeds, rates, target_count):
+
+def trim_to_target(seeds, rates, target_count, score_ma_window):
+    """
+    Trims the list of seeds to target_count based on moving average of historical scores.
+    - rates: dict of {seed_name: [score1, score2, ...]}
+    - Uses moving_average_of_scores(rates[seed_name], score_ma_window) for ranking.
+    - Breaks ties randomly (stable if seed is set).
+    """
+    from collections import defaultdict
+    import random
+
+    # Group seeds by their MA score
     grouped = defaultdict(list)
     for s in seeds:
-        grouped[rates[s["name"]]].append(s)
+        ma_score = moving_average_of_scores(rates[s["name"]], score_ma_window)
+        grouped[ma_score].append(s)
     sorted_rates = sorted(grouped.keys(), reverse=True)
     final = []
     for rate in sorted_rates:
@@ -593,6 +664,7 @@ def trim_to_target(seeds, rates, target_count):
             break
     return final[:target_count]
 
+
 def generate_derived_seed(seed_type, seed):
     system_prompt = DERIVATION_SYSTEM_PROMPT
     user_prompt = seed["value"]
@@ -601,12 +673,12 @@ def generate_derived_seed(seed_type, seed):
     except Exception as e:
         printl(f"LLM derivation failed for {seed_type}: {e}, using fallback.", "warning")
         value = f"error-derived"
-    name = f"{seed['name']}-{nanoid(size=6)}"
+    name = f"{seed['name']}-{nanoid(size=6)}llmderived"
     derived = {
         "name": name,
         "value": value,
         "capital": seed.get("capital", False),
-        "score": [0.0]
+        "score": []
     }
     # If this is a delimiter and has "closing", preserve it
     if seed_type == "delimiter" and "closing" in seed:
@@ -617,16 +689,16 @@ def generate_derived_seed(seed_type, seed):
 def generate_created_seed(seed_type):
     system_prompt = CREATION_SYSTEM_PROMPTS.get(seed_type)
     try:
-        value = get_single_llm_completion(system_prompt)
+        value = get_single_llm_completion(system_prompt, temperature=1.20)
     except Exception as e:
         printl(f"LLM creation failed for {seed_type}: {e}, using fallback.", "warning")
         value = f"error-created"
-    name = "-".join([word for word in value.split()[:2] if word.isascii()]) + f"-{nanoid(size=6)}"
+    name = "-".join([word for word in value.replace("-", " ").replace("*", " ").split()[:2] if word.isalnum() and word.isascii()]) + f"-{nanoid(size=6)}llmcreated"
     created = {
         "name": name,
         "value": value,
         "capital": False,
-        "score": [0.0]
+        "score": []
     }
     # If this is a delimiter, set "closing" to empty
     if seed_type == "delimiter":
@@ -638,16 +710,16 @@ def generate_derived_instruction_seed(seed_type, seed):
     system_prompt = DERIVATION_SYSTEM_PROMPT
     user_prompt = seed["value"]
     try:
-        value = get_single_llm_completion(system_prompt, user_prompt)
+        value = get_single_llm_completion(system_prompt, user_prompt, "gpt-4o-mini")
     except Exception as e:
         printl(f"LLM derivation failed for {seed_type} instruction: {e}, using fallback.", "warning")
         value = f"error-derived"
-    name = f"{seed['name']}-{nanoid(size=6)}"
+    name = f"{seed['name']}-{nanoid(size=6)}llmderived"
     return {
         "name": name,
         "value": value,
         "capital": seed.get("capital", False),
-        "score": [0.0],
+        "score": [],
         "verify": deepcopy(seed.get("verify", [])),
         "reason": []
     }
@@ -655,62 +727,89 @@ def generate_derived_instruction_seed(seed_type, seed):
 def generate_created_instruction_seed(seed_type):
     system_prompt = CREATION_SYSTEM_PROMPTS.get(seed_type)
     try:
-        value = get_single_llm_completion(system_prompt)
+        value = get_single_llm_completion(system_prompt, temperature=1.35)
     except Exception as e:
         printl(f"LLM creation failed for {seed_type} instruction: {e}, using fallback.", "warning")
         value = f"error-created"
-    name = "-".join([word for word in value.split()[:2] if word.isascii()]) + f"-{nanoid(size=6)}"
+    name = "-".join([word for word in value.split()[:2] if word.isascii()]) + f"-{nanoid(size=6)}llmcreated"
     return {
         "name": name,
         "value": value,
         "capital": False,
-        "score": [0.0],
+        "score": [],
         "verify": [],
         "reason": []
     }
+
+def generate_derived_reason_seed(parent_type, parent_seed, base_reason):
+    """
+    Derive a new reason variant from the given base_reason, for a new_instruction type.
+    parent_type: str, e.g. "new_instruction_xss"
+    parent_seed: dict, e.g. {"name": "block", "value": "block all output"}
+    base_reason: dict, a single reason seed to be varied (with keys name, value, etc)
+    """
+    system_prompt = DERIVATION_SYSTEM_PROMPT  # should instruct LLM to vary the reason, context-aware
+    # For maximum context, the prompt should include parent new_instruction value and base reason value.
+    user_prompt = (
+        f"Instruction: {parent_seed['value']}\n"
+        f"Base reason: {base_reason['value']}\n"
+        "Write a similar but distinct reason for using this instruction."
+    )
+    try:
+        value = get_single_llm_completion(system_prompt, user_prompt, "gpt-4o-mini")
+    except Exception as e:
+        printl(f"LLM reason derivation failed for {parent_type}: {e}, using fallback.", "warning")
+        value = f"error-derived"
+    name = f"{base_reason['name']}-{nanoid(size=6)}llmderived"
+    return {
+        "name": name,
+        "value": value,
+        "capital": base_reason.get("capital", False),
+        "score": []
+    }
+
 
 def generate_created_reason_seed(parent_type, instr):
     parent_value = instr.get("value", "")
     system_prompt = CREATION_SYSTEM_PROMPTS.get("reason")
     user_prompt = parent_value
     try:
-        value = get_single_llm_completion(system_prompt, user_prompt)
+        value = get_single_llm_completion(system_prompt, user_prompt, temperature=1.35)
     except Exception as e:
         printl(f"LLM creation failed for {parent_type} reason: {e}, using fallback.", "warning")
         value = f"error-created"
-    name = f"{instr['name']}-reason-{nanoid(size=6)}"
+    name = f"{instr['name']}-reason-{nanoid(size=6)}llmcreated"
     return {
         "name": name,
         "value": value,
         "capital": False,
-        "score": [0.0]
+        "score": []
     }
 
-def get_single_llm_completion(system_prompt, user_prompt=None, model="gpt-4.1-nano"):
+def get_single_llm_completion(system_prompt, user_prompt=None, model="gpt-4.1-nano", temperature=1.0):
     # The system prompt is always the first in the message list for OpenAI
     if user_prompt:
         messages = [{"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}]
     else:
         messages = [{"role": "system", "content": system_prompt}]
-    # n=1, deterministic completion for seed creation (temperature=0 for stability)
-    completions = get_openai_responses(messages, n=1, model=model, temperature=0)
+    completions = get_openai_responses(messages, n=1, model=model, temperature=temperature)
     # get_openai_responses always returns a list
     return completions[0].strip()
 
 def combine_patterns_minimal(
-    pattern_seeds: dict,
+    pattern_seeds: dict, score_ma_window,
     excluded_types=None,
     disabled_map=None,
     debug=False
 ):
     """
-    Generates the minimal set of patterns to evaluate every seed's effect:
-      - One 'base' pattern (all best seeds & best reason)
-      - For each seed type (delimiter, exploit, reason), one pattern per suboptimal seed
-      - Skip entire new_instruction type if it's excluded/disabled
-      - For other types if excluded/disabled, only use best seed (no variants)
-      - Skip all PL mappings if no_prompt_leaking is True
+    Generates the minimal set of patterns to evaluate every seed's effect.
+    - For both prompt-leaking and non-PL types, every improvable seed type (delimiter, exploit, PL seeds, etc) gets patterns where only that type varies.
+    - expected_input is always fixed to its best seed.
+    - "seed_names" is an object mapping seed types to names.
+    - Names use ~ for PL-internal concat, _ otherwise.
+    - Exclusion/disabled logic is enforced for all seed types and pattern groups.
     """
     import copy, json
 
@@ -718,8 +817,9 @@ def combine_patterns_minimal(
     disabled = disabled_map or {}
 
     def best_seed(seeds):
-        if not seeds: return None
-        return max(seeds, key=lambda s: float(s["score"][0]))
+        if not seeds:
+            return None
+        return max(seeds, key=lambda s: moving_average_of_scores(s["score"], score_ma_window))
 
     patterns = []
     seen = set()
@@ -729,120 +829,243 @@ def combine_patterns_minimal(
         if rec["name"] not in seen:
             patterns.append(rec)
             seen.add(rec["name"])
-            if debug:
-                print("Added:", rec["name"])
+            # if debug:
+            #     print("Added:", rec["name"])
 
-    # --- 1) Prompt‑leaking PL mappings (convert + repeat) ---
-    if not disabled.get("no_prompt_leaking", False):
-        # a) Convert
-        convert_keys = ["convert_verb","object_first_part","object_second_part","convert_target","convert_reason"]
-        use = [k for k in convert_keys if k in pattern_seeds]
-        base = {k: best_seed(pattern_seeds[k]) for k in use}
+    # ========== 1) Prompt-leaking mappings (convert, repeat) ==========
+    if not disabled.get("no_prompt_leaking"):
+        # Always use best expected_input for PL patterns
+        expected_input = best_seed(pattern_seeds.get("expected_input", []))
+        delimiter_best = best_seed(pattern_seeds.get("delimiter", []))
+        exploit_best = best_seed(pattern_seeds.get("exploit", []))
 
-        # build base name/value/score
-        obj_val = base["object_first_part"]["value"] + (
-            base["object_second_part"]["value"].capitalize()
-            if base["object_first_part"]["capital"] else base["object_second_part"]["value"]
-        )
-        base_val = base["convert_verb"]["value"].replace("{object}", obj_val) + base["convert_target"]["value"]
-        base_name = "~".join(base[k]["name"] for k in use)
-        base_score = [float(base[k]["score"][0]) for k in use]
+        # ---- a) Convert ----
+        convert_keys = ["convert_verb", "object_first_part", "object_second_part", "convert_target", "convert_reason"]
+        pl_all_types = ["expected_input", "delimiter", "exploit"] + convert_keys
 
+        use = {k: best_seed(pattern_seeds[k]) for k in convert_keys if k in pattern_seeds}
+        # Compose PL seed part name
+        def pl_seed_name(d): return "~".join(d[k]["name"] for k in convert_keys)
+
+        def pl_seed_names_obj(d, delimiter, exploit):
+            # Dict mapping seed type to name (for reporting/eval)
+            return {
+                "expected_input": expected_input["name"],
+                "delimiter": delimiter["name"],
+                "exploit": exploit["name"],
+                **{k: d[k]["name"] for k in convert_keys}
+            }
+
+        def pl_score_list(d, delimiter, exploit):
+            return [moving_average_of_scores(expected_input["score"], score_ma_window),
+                    moving_average_of_scores(delimiter["score"], score_ma_window),
+                    moving_average_of_scores(exploit["score"], score_ma_window),
+                    *[moving_average_of_scores(d[k]["score"], score_ma_window) for k in convert_keys]
+            ]
+
+        def pl_value(d, delimiter, exploit):
+            obj_val = d["object_first_part"]["value"] + (
+                d["object_second_part"]["value"].capitalize() if d["object_first_part"]["capital"] else d["object_second_part"]["value"]
+            )
+            val = expected_input["value"].capitalize()
+            val += delimiter["value"]
+            if delimiter["value"] == "":
+                val += exploit["value"].capitalize() if expected_input["capital"] else exploit["value"]
+            else:
+                val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
+            val += d["convert_verb"]["value"].replace("{object}", obj_val)
+            val += d["convert_target"]["value"]
+            if "closing" in delimiter:
+                val += delimiter["closing"]
+            return val
+
+        # ---- Generate base pattern (all best seeds) ----
+        base_delim = delimiter_best
+        base_exploit = exploit_best
+        base = dict(use)
+        base_name = "_".join([expected_input["name"], base_delim["name"], base_exploit["name"], pl_seed_name(base)])
         add_pattern({
             "name": base_name,
-            "value": base_val,
+            "value": pl_value(base, base_delim, base_exploit),
             "capital": base["convert_target"]["capital"],
-            "score": base_score,
-            "verify": [{"type":"prompt_leaking"}],
+            "score": pl_score_list(base, base_delim, base_exploit),
+            "verify": [{"type": "prompt_leaking"}],
             "reason": base["convert_reason"],
-            "type": "prompt_leaking_convert"
+            "type": "prompt_leaking_convert",
+            "seed_names": pl_seed_names_obj(base, base_delim, base_exploit)
         })
 
-        # variants: for each key in use
-        for k in use:
-            if k in excluded:
-                continue
-            for alt in pattern_seeds[k]:
-                if alt["name"] == base[k]["name"]:
+        # ---- Vary delimiter (if improvable) ----
+        if "delimiter" not in excluded and "delimiter" in pattern_seeds:
+            for alt in pattern_seeds["delimiter"]:
+                if alt["name"] == delimiter_best["name"]:
                     continue
-                mod = dict(base)
-                mod[k] = alt
-                obj_val2 = mod["object_first_part"]["value"] + (
-                    mod["object_second_part"]["value"].capitalize()
-                    if mod["object_first_part"]["capital"] else mod["object_second_part"]["value"]
-                )
-                val2 = mod["convert_verb"]["value"].replace("{object}", obj_val2) + mod["convert_target"]["value"]
-                name2 = "~".join(mod[x]["name"] for x in use)
-                score2 = [float(mod[x]["score"][0]) for x in use]
+                name = "_".join([expected_input["name"], alt["name"], base_exploit["name"], pl_seed_name(base)])
                 add_pattern({
-                    "name": name2,
-                    "value": val2,
-                    "capital": mod["convert_target"]["capital"],
-                    "score": score2,
-                    "verify": [{"type":"prompt_leaking"}],
-                    "reason": mod["convert_reason"],
-                    "type": "prompt_leaking_convert"
+                    "name": name,
+                    "value": pl_value(base, alt, base_exploit),
+                    "capital": base["convert_target"]["capital"],
+                    "score": pl_score_list(base, alt, base_exploit),
+                    "verify": [{"type": "prompt_leaking"}],
+                    "reason": base["convert_reason"],
+                    "type": "prompt_leaking_convert",
+                    "seed_names": pl_seed_names_obj(base, alt, base_exploit)
                 })
 
-        # b) Repeat
-        repeat_keys = ["repeat_verb","object_first_part","object_second_part","repeat_reason"]
-        use = [k for k in repeat_keys if k in pattern_seeds]
-        base = {k: best_seed(pattern_seeds[k]) for k in use}
+        # ---- Vary exploit (if improvable) ----
+        if "exploit" not in excluded and "exploit" in pattern_seeds:
+            for alt in pattern_seeds["exploit"]:
+                if alt["name"] == exploit_best["name"]:
+                    continue
+                name = "_".join([expected_input["name"], base_delim["name"], alt["name"], pl_seed_name(base)])
+                add_pattern({
+                    "name": name,
+                    "value": pl_value(base, base_delim, alt),
+                    "capital": base["convert_target"]["capital"],
+                    "score": pl_score_list(base, base_delim, alt),
+                    "verify": [{"type": "prompt_leaking"}],
+                    "reason": base["convert_reason"],
+                    "type": "prompt_leaking_convert",
+                    "seed_names": pl_seed_names_obj(base, base_delim, alt)
+                })
 
-        obj_val = base["object_first_part"]["value"] + (
-            base["object_second_part"]["value"].capitalize()
-            if base["object_first_part"]["capital"] else base["object_second_part"]["value"]
-        )
-        base_val = base["repeat_verb"]["value"].replace("{object}", obj_val)
-        base_name = "~".join(base[k]["name"] for k in use)
-        base_score = [float(base[k]["score"][0]) for k in use]
-
-        add_pattern({
-            "name": base_name,
-            "value": base_val,
-            "capital": base["repeat_verb"]["capital"],
-            "score": base_score,
-            "verify": [{"type":"prompt_leaking"}],
-            "reason": base["repeat_reason"],
-            "type": "prompt_leaking_repeat"
-        })
-
-        for k in use:
+        # ---- Vary each PL seed ----
+        for k in convert_keys:
             if k in excluded:
                 continue
-            for alt in pattern_seeds[k]:
-                if alt["name"] == base[k]["name"]:
+            for alt in pattern_seeds.get(k, []):
+                if alt["name"] == use[k]["name"]:
                     continue
-                mod = dict(base)
+                mod = dict(use)
                 mod[k] = alt
-                obj_val2 = mod["object_first_part"]["value"] + (
-                    mod["object_second_part"]["value"].capitalize()
-                    if mod["object_first_part"]["capital"] else mod["object_second_part"]["value"]
-                )
-                val2 = mod["repeat_verb"]["value"].replace("{object}", obj_val2)
-                name2 = "~".join(mod[x]["name"] for x in use)
-                score2 = [float(mod[x]["score"][0]) for x in use]
+                name = "_".join([
+                    expected_input["name"], base_delim["name"], base_exploit["name"], pl_seed_name(mod)
+                ])
                 add_pattern({
-                    "name": name2,
-                    "value": val2,
+                    "name": name,
+                    "value": pl_value(mod, base_delim, base_exploit),
+                    "capital": mod["convert_target"]["capital"],
+                    "score": pl_score_list(mod, base_delim, base_exploit),
+                    "verify": [{"type": "prompt_leaking"}],
+                    "reason": mod["convert_reason"],
+                    "type": "prompt_leaking_convert",
+                    "seed_names": pl_seed_names_obj(mod, base_delim, base_exploit)
+                })
+
+        # ---- b) Repeat ----
+        repeat_keys = ["repeat_verb", "object_first_part", "object_second_part", "repeat_reason"]
+        pl_all_types_repeat = ["expected_input", "delimiter", "exploit"] + repeat_keys
+
+        use = {k: best_seed(pattern_seeds[k]) for k in repeat_keys if k in pattern_seeds}
+
+        def pl_repeat_name(d): return "~".join(d[k]["name"] for k in repeat_keys)
+        def pl_repeat_seed_names_obj(d, delimiter, exploit):
+            return {
+                "expected_input": expected_input["name"],
+                "delimiter": delimiter["name"],
+                "exploit": exploit["name"],
+                **{k: d[k]["name"] for k in repeat_keys}
+            }
+        def pl_repeat_score_list(d, delimiter, exploit):
+            return [moving_average_of_scores(expected_input["score"], score_ma_window),
+                    moving_average_of_scores(delimiter["score"], score_ma_window),
+                    moving_average_of_scores(exploit["score"], score_ma_window),
+                    *[moving_average_of_scores(d[k]["score"], score_ma_window) for k in repeat_keys]
+            ]
+        def pl_repeat_value(d, delimiter, exploit):
+            obj_val = d["object_first_part"]["value"] + (
+                d["object_second_part"]["value"].capitalize() if d["object_first_part"]["capital"] else d["object_second_part"]["value"]
+            )
+            val = expected_input["value"].capitalize()
+            val += delimiter["value"]
+            if delimiter["value"] == "":
+                val += exploit["value"].capitalize() if expected_input["capital"] else exploit["value"]
+            else:
+                val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
+            val += d["repeat_verb"]["value"].replace("{object}", obj_val)
+            if "closing" in delimiter:
+                val += delimiter["closing"]
+            return val
+
+        base_delim = delimiter_best
+        base_exploit = exploit_best
+        base = dict(use)
+        base_name = "_".join([expected_input["name"], base_delim["name"], base_exploit["name"], pl_repeat_name(base)])
+        add_pattern({
+            "name": base_name,
+            "value": pl_repeat_value(base, base_delim, base_exploit),
+            "capital": base["repeat_verb"]["capital"],
+            "score": pl_repeat_score_list(base, base_delim, base_exploit),
+            "verify": [{"type": "prompt_leaking"}],
+            "reason": base["repeat_reason"],
+            "type": "prompt_leaking_repeat",
+            "seed_names": pl_repeat_seed_names_obj(base, base_delim, base_exploit)
+        })
+
+        # Vary delimiter
+        if "delimiter" not in excluded and "delimiter" in pattern_seeds:
+            for alt in pattern_seeds["delimiter"]:
+                if alt["name"] == delimiter_best["name"]:
+                    continue
+                name = "_".join([expected_input["name"], alt["name"], base_exploit["name"], pl_repeat_name(base)])
+                add_pattern({
+                    "name": name,
+                    "value": pl_repeat_value(base, alt, base_exploit),
+                    "capital": base["repeat_verb"]["capital"],
+                    "score": pl_repeat_score_list(base, alt, base_exploit),
+                    "verify": [{"type": "prompt_leaking"}],
+                    "reason": base["repeat_reason"],
+                    "type": "prompt_leaking_repeat",
+                    "seed_names": pl_repeat_seed_names_obj(base, alt, base_exploit)
+                })
+        # Vary exploit
+        if "exploit" not in excluded and "exploit" in pattern_seeds:
+            for alt in pattern_seeds["exploit"]:
+                if alt["name"] == exploit_best["name"]:
+                    continue
+                name = "_".join([expected_input["name"], base_delim["name"], alt["name"], pl_repeat_name(base)])
+                add_pattern({
+                    "name": name,
+                    "value": pl_repeat_value(base, base_delim, alt),
+                    "capital": base["repeat_verb"]["capital"],
+                    "score": pl_repeat_score_list(base, base_delim, alt),
+                    "verify": [{"type": "prompt_leaking"}],
+                    "reason": base["repeat_reason"],
+                    "type": "prompt_leaking_repeat",
+                    "seed_names": pl_repeat_seed_names_obj(base, base_delim, alt)
+                })
+        # Vary each PL repeat seed
+        for k in repeat_keys:
+            if k in excluded:
+                continue
+            for alt in pattern_seeds.get(k, []):
+                if alt["name"] == use[k]["name"]:
+                    continue
+                mod = dict(use)
+                mod[k] = alt
+                name = "_".join([expected_input["name"], base_delim["name"], base_exploit["name"], pl_repeat_name(mod)])
+                add_pattern({
+                    "name": name,
+                    "value": pl_repeat_value(mod, base_delim, base_exploit),
                     "capital": mod["repeat_verb"]["capital"],
-                    "score": score2,
-                    "verify": [{"type":"prompt_leaking"}],
+                    "score": pl_repeat_score_list(mod, base_delim, base_exploit),
+                    "verify": [{"type": "prompt_leaking"}],
                     "reason": mod["repeat_reason"],
-                    "type": "prompt_leaking_repeat"
+                    "type": "prompt_leaking_repeat",
+                    "seed_names": pl_repeat_seed_names_obj(mod, base_delim, base_exploit)
                 })
     elif debug:
         print("PL mappings skipped")
 
-    # --- 2) Non‑PL new_instruction types ---
+    # ========== 2) Non‑PL new_instruction types ==========
     exp_best = best_seed(pattern_seeds.get("expected_input", []))
     del_best = best_seed(pattern_seeds.get("delimiter", []))
     exp_seeds = pattern_seeds.get("exploit", [])
 
-    for ni in [k for k in pattern_seeds if k.startswith("new_instruction_") and k!="new_instruction_prompt_leaking"]:
-        if ni in excluded or disabled.get(ni):
-            if debug:
-                print(f"Skipping {ni}")
+    for ni in [k for k in pattern_seeds if k.startswith("new_instruction_") and k != "new_instruction_prompt_leaking"]:
+        if ni in excluded or disabled.get(ni, False):
+            # if debug:
+            #     print(f"Skipping {ni}")
             continue
 
         seeds = pattern_seeds[ni]
@@ -852,7 +1075,6 @@ def combine_patterns_minimal(
         reasons = ni_best.get("reason", [])
         if not reasons:
             continue
-        # pick best reason
         rs_best = best_seed(reasons)
 
         base = {
@@ -862,7 +1084,6 @@ def combine_patterns_minimal(
             "new_instruction": ni_best,
             "reason": rs_best
         }
-        # helper to compose
         def compose(c):
             s = ""
             if c["expected_input"]:
@@ -893,7 +1114,15 @@ def combine_patterns_minimal(
                 s += c["delimiter"]["closing"]
             return s
 
-        # base pattern
+        def make_seed_names(c):
+            return {
+                "expected_input": c["expected_input"]["name"],
+                "delimiter": c["delimiter"]["name"],
+                "exploit": c["exploit"]["name"],
+                "new_instruction": c["new_instruction"]["name"],
+                "reason": c["reason"]["name"]
+            }
+
         name_base = "_".join([
             base["expected_input"]["name"],
             base["delimiter"]["name"],
@@ -902,51 +1131,54 @@ def combine_patterns_minimal(
             base["reason"]["name"]
         ])
         score_base = [
-            float(base[x]["score"][0]) for x in
-            ["expected_input","delimiter","exploit","new_instruction"]
-        ] + [float(base["reason"]["score"][0])]
+            moving_average_of_scores(base[x]["score"], score_ma_window) for x in
+            ["expected_input", "delimiter", "exploit", "new_instruction"]
+        ] + [moving_average_of_scores(base["reason"], score_ma_window)]
         add_pattern({
             "name": name_base,
             "value": compose(base),
             "score": score_base,
             "verify": ni_best["verify"],
-            "type": ni
+            "type": ni,
+            "seed_names": make_seed_names(base)
         })
 
         # variants: delimiter
-        if "delimiter" not in excluded:
+        if "delimiter" not in excluded and "delimiter" in pattern_seeds:
             for alt in pattern_seeds.get("delimiter", []):
                 if alt["name"] == base["delimiter"]["name"]:
                     continue
-                c = dict(base); c["delimiter"] = alt
-                n = "_".join([c["expected_input"]["name"],c["delimiter"]["name"],
-                              c["exploit"]["name"],c["new_instruction"]["name"],
-                              c["reason"]["name"]])
+                c = dict(base)
+                c["delimiter"] = alt
+                n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
+                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
                 sc = [
-                    float(c[x]["score"][0]) for x in
-                    ["expected_input","delimiter","exploit","new_instruction"]
-                ] + [float(c["reason"]["score"][0])]
+                    moving_average_of_scores(c[x]["score"], score_ma_window) for x in
+                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
                     "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni
+                    "score": sc, "verify": ni_best["verify"], "type": ni,
+                    "seed_names": make_seed_names(c)
                 })
 
         # variants: exploit
-        if "exploit" not in excluded:
+        if "exploit" not in excluded and "exploit" in pattern_seeds:
             for alt in pattern_seeds.get("exploit", []):
                 if alt["name"] == base["exploit"]["name"]:
                     continue
-                c = dict(base); c["exploit"] = alt
-                n = "_".join([c["expected_input"]["name"],c["delimiter"]["name"],
-                              c["exploit"]["name"],c["new_instruction"]["name"],
-                              c["reason"]["name"]])
+                c = dict(base)
+                c["exploit"] = alt
+                n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
+                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
                 sc = [
-                    float(c[x]["score"][0]) for x in
-                    ["expected_input","delimiter","exploit","new_instruction"]
-                ] + [float(c["reason"]["score"][0])]
+                    moving_average_of_scores(c[x]["score"], score_ma_window) for x in
+                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
                     "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni
+                    "score": sc, "verify": ni_best["verify"], "type": ni,
+                    "seed_names": make_seed_names(c)
                 })
 
         # variants: reason
@@ -955,23 +1187,23 @@ def combine_patterns_minimal(
             for alt in reasons:
                 if alt["name"] == base["reason"]["name"]:
                     continue
-                c = dict(base); c["reason"] = alt
-                n = "_".join([c["expected_input"]["name"],c["delimiter"]["name"],
-                              c["exploit"]["name"],c["new_instruction"]["name"],
-                              c["reason"]["name"]])
+                c = dict(base)
+                c["reason"] = alt
+                n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
+                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
                 sc = [
-                    float(c[x]["score"][0]) for x in
-                    ["expected_input","delimiter","exploit","new_instruction"]
-                ] + [float(c["reason"]["score"][0])]
+                    moving_average_of_scores(c[x]["score"], score_ma_window) for x in
+                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
                     "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni
+                    "score": sc, "verify": ni_best["verify"], "type": ni,
+                    "seed_names": make_seed_names(c)
                 })
 
     if debug:
         print(f"Total patterns: {len(patterns)}")
     return patterns
-
 
 
 
@@ -1101,3 +1333,15 @@ def load_seeds_from_files(seed_dir="patterns"):
                 print(f"Warning: failed to load {path}: {e}")
     return pattern_seeds
 
+def moving_average_of_scores(scores, window_size):
+    """
+    Calculate a moving average of scores for each seed.
+    :param scores: List of scores.
+    :param window_size: Size of the moving average window.
+    :return: Moving average (0 if not scores).
+    """
+    if not scores:
+        return 0.0
+    if len(scores) < window_size:
+        window_size = len(scores)
+    return sum(scores[-window_size:]) / window_size
