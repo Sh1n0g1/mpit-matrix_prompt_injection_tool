@@ -1,4 +1,5 @@
-import openai
+import os
+from openai import OpenAI
 from mpit_logger import printl
 def get_openai_responses(
     messages:list,
@@ -18,7 +19,7 @@ def get_openai_responses(
   :return: The response from the model.
   """
   try:
-    client = openai.Client()
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     completion = client.chat.completions.create(
       model=model,
       messages=messages,
