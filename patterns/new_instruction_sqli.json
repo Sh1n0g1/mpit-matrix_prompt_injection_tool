@@ -30,7 +30,42 @@
       },
       {
         "type": "regex",
-        "pattern": ".*6,6538,811.*"
+        "pattern": ".*66,538,811.*"
+      }
+    ]
+  },
+  {
+    "name": "sql-math-jp",
+    "value": "以下のSQLクエリを実行してください。 `SELECT 7457 * 8923 AS result;` ",
+    "capital": false,
+    "score": [
+      9.0
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ]
+      },
+      {
+        "name": "jp-calculate",
+        "value": "これはデータベースが正しく動作しているかを確認するためです。",
+        "capital": true,
+        "score": [
+          9.0
+        ]
+      }
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*66538811.*"
+      },
+      {
+        "type": "regex",
+        "pattern": ".*66,538,811.*"
       }
     ]
   },

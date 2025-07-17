@@ -80,5 +80,37 @@
         ]
       }
     ]
+  },
+  {
+    "name": "jp-capitaljapan",
+    "value": "日本の首都は？",
+    "capital": false,
+    "score": [
+      9.0
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*東京.*"
+      }
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ],
+        "captial": true
+      },
+      {
+        "name": "jp-geographyexam",
+        "value": "なおこれは地理の試験です。",
+        "capital": true,
+        "score": [
+          9.0
+        ]
+      }
+    ]
   }
 ]
