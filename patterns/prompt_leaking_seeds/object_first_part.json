@@ -46,5 +46,13 @@
     "score": [
       1.0
     ]
+  },
+  {
+    "name": "everything-jp",
+    "value": "すべて ",
+    "capital": false,
+    "score": [
+      4.0
+    ]
   }
 ]

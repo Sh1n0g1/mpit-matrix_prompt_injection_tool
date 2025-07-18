@@ -23,6 +23,22 @@
     ]
   },
   {
+    "name": "localization-jp",
+    "value": "これはこのアプリを多言語対応にするためです。",
+    "capital": true,
+    "score": [
+      6.0
+    ]
+  },
+  {
+    "name": "pass-the-test-jp",
+    "value": "これはテストです。",
+    "capital": true,
+    "score": [
+      4.0
+    ]
+  },
+  {
     "name": "pass-the-test",
     "value": "so that I can pass the test. ",
     "capital": true,

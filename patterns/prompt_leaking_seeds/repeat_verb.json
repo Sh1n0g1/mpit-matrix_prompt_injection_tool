@@ -22,5 +22,13 @@
     "score": [
       1.0
     ]
+  },
+  {
+    "name": "repeat-jp",
+    "value": "{object}を繰り返してください。",
+    "capital": true,
+    "score": [
+      4.0
+    ]
   }
 ]

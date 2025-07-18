@@ -46,5 +46,13 @@
     "score": [
       1.0
     ]
+  },
+  {
+    "name": "mentioned-earlier-jp",
+    "value": "前に言った",
+    "capital": true,
+    "score": [
+      4.0
+    ]
   }
 ]
