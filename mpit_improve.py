@@ -237,9 +237,17 @@ def run_improve_mode(args, report_dir):
     if args.derivation_ratio < 0 or args.derivation_ratio > 1:
         printl("Derivation ratio must be between 0 and 1.", "error")
         sys.exit(1)
+    if args.survival_rate_threshold < 0.0 or args.survival_rate_threshold > 10.0:
+        printl("Survival rate threshold must be between 0 and 10.", "error")
+        sys.exit(1)
+    if args.survival_ratio_threshold < 0.0 or args.survival_ratio_threshold > 1.0:
+        printl("Survival ratio threshold must be between 0 and 1.", "error")
+        sys.exit(1)
 
     derivation_ratio = args.derivation_ratio
     score_ma_window = args.score_moving_average_window
+    survival_rate_threshold = args.survival_rate_threshold
+    survival_ratio_threshold = args.survival_ratio_threshold
 
     excluded = set(args.exclude_seed_types.split(",")) if args.exclude_seed_types else set()
 
@@ -252,7 +260,7 @@ def run_improve_mode(args, report_dir):
         "new_instruction_xss": args.no_xss,
         "new_instruction_mdi": args.no_mdi,
         "new_instruction_osr": args.no_osr,
-        # "new_instruction_prompt_leaking": args.no_prompt_leaking
+        "new_instruction_prompt_leaking": args.no_prompt_leaking
     }
 
     for seed_type, is_disabled in disabled_map.items():
@@ -278,6 +286,21 @@ def run_improve_mode(args, report_dir):
 
     # 2. Load all pattern seeds
     pattern_seeds = load_seeds_from_files()
+
+    # # for debugging, remove all scores from pattern seeds (including reasons) and update the JSON files
+    # for seed_type, seeds in pattern_seeds.items():
+    #     for seed in seeds:
+    #         seed["score"][0] *= 0.1
+    #         if "reason" in seed:
+    #             for reason in seed["reason"]:
+    #                 reason["score"][0] *= 0.1
+    #     if seed_type in PL_SEED_TYPES:
+    #         path = os.path.join(SEED_JSON_DIR, PL_SEED_SUBDIR, f"{seed_type}.json")
+    #     else:
+    #         path = os.path.join(SEED_JSON_DIR, f"{seed_type}.json")
+    #     with open(path, "w", encoding="utf-8") as f:
+    #         json.dump(seeds, f, indent=2, ensure_ascii=False)
+    #     printl(f"Updated {path} with cleared scores.", "info")
 
     # 3. Generate expected input from system prompt, add as a seed (like S mode)
     expected_input_path = os.path.join(report_dir, "expected_input.txt")
@@ -397,8 +420,8 @@ def run_improve_mode(args, report_dir):
             seed_type,
             mpit_results,
             load_seeds(seed_type),
-            args.survival_rate_threshold,
-            args.survival_ratio_threshold,
+            survival_rate_threshold,
+            survival_ratio_threshold,
             target_count,
             derivation_ratio,
             score_ma_window
@@ -416,7 +439,7 @@ def run_improve_mode(args, report_dir):
         ni_target = get_target_count(ni_type, target_overrides, TARGET_COUNTS)
         ni_seeds = load_seeds(ni_type)
         ni_survivors, ni_report = improve_new_instruction_seeds(
-            ni_type, mpit_results, ni_seeds, args.survival_rate_threshold, args.survival_ratio_threshold, ni_target, derivation_ratio, score_ma_window
+            ni_type, mpit_results, ni_seeds, survival_rate_threshold, survival_ratio_threshold, ni_target, derivation_ratio, score_ma_window
         )
         improved_ni_seeds = []
         ni_reason_report = {}
@@ -428,7 +451,7 @@ def run_improve_mode(args, report_dir):
             reason_target = get_target_count(ni_type, target_overrides, TARGET_COUNTS, is_reason=True)
             final_reasons, reason_report = improve_reason_seeds(
                 ni_type, instr_name, instr_value, mpit_results, old_reasons, reason_target,
-                args.survival_rate_threshold, args.survival_ratio_threshold, derivation_ratio, score_ma_window
+                survival_rate_threshold, survival_ratio_threshold, derivation_ratio, score_ma_window
             )
             improved = deepcopy(instr)
             improved["reason"] = final_reasons
@@ -473,7 +496,15 @@ def load_seeds(seed_type):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
+def improve_normal_seed_type(seed_type, mpit_results, seeds, default_rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
+    # load JSON object generated_success_rates_history.json
+    history_path = "reports/generated_success_rates_history.json"
+    if os.path.exists(history_path):
+        with open(history_path, "r", encoding="utf-8") as f:
+            rates_history = json.load(f)
+    else:
+        rates_history = {}
+
     usage = Counter()
     success = Counter()
     for s in seeds:
@@ -488,6 +519,11 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, rat
             name = s["name"]
             seed_rates[name] = s["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
+
+    rate_threshold = default_rate_threshold if not seed_type in rates_history.keys() or not rates_history[seed_type]["derived_sr"] or not rates_history[seed_type]["created_sr"] \
+    else ((rates_history[seed_type]["derived_sr"] * derivation_ratio + rates_history[seed_type]["created_sr"] * (1 - derivation_ratio)) \
+        * (rates_history[seed_type]["count_derived"] + rates_history[seed_type]["count_created"]) + default_rate_threshold) \
+        / (rates_history[seed_type]["count_derived"] + rates_history[seed_type]["count_created"] + 1) * 10
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
 
@@ -518,21 +554,36 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, rate_threshold, rat
         "derived": [s["name"] for s in derived],
         "created": [s["name"] for s in created]
     }
+    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "reports/generated_success_rates_history.json")
     return survivors + derived + created, report
 
-def improve_new_instruction_seeds(seed_type, mpit_results, seeds, rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
+def improve_new_instruction_seeds(seed_type, mpit_results, seeds, default_rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
+    # load JSON object generated_success_rates_history.json
+    history_path = "reports/generated_success_rates_history.json"
+    if os.path.exists(history_path):
+        with open(history_path, "r", encoding="utf-8") as f:
+            rates_history = json.load(f)
+    else:
+        rates_history = {}
+
+    # === Evaluate, trim, and replenish new_instruction seeds ===
     usage = Counter()
     success = Counter()
-    for result in mpit_results:
-        if seed_type in result["seed_names"].keys() and s["name"] == result["seed_names"][seed_type]:
-            usage[s["name"]] += 1
-            if result["attack_success"]:
-                success[s["name"]] += 1
+    for s in seeds:
+        for result in mpit_results:
+            if seed_type in result["seed_names"].keys() and s["name"] == result["seed_names"][seed_type]:
+                usage[s["name"]] += 1
+                if result["attack_success"]:
+                    success[s["name"]] += 1
     seed_rates = {}
     for s in seeds:
             name = s["name"]
             seed_rates[name] = s["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
+    rate_threshold = default_rate_threshold if not seed_type in rates_history.keys() or not rates_history[seed_type]["derived_sr"] or not rates_history[seed_type]["created_sr"] \
+        else ((rates_history[seed_type]["derived_sr"] * derivation_ratio + rates_history[seed_type]["created_sr"] * (1 - derivation_ratio)) \
+            * (rates_history[seed_type]["count_derived"] + rates_history[seed_type]["count_created"]) + default_rate_threshold) \
+            / (rates_history[seed_type]["count_derived"] + rates_history[seed_type]["count_created"] + 1)
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
     count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
@@ -561,13 +612,14 @@ def improve_new_instruction_seeds(seed_type, mpit_results, seeds, rate_threshold
         "derived": [s["name"] for s in derived],
         "created": [s["name"] for s in created]
     }
+    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "reports/generated_success_rates_history.json")
     return survivors + derived + created, report
 
 def improve_reason_seeds(
     parent_type, parent_name, parent_value,
     mpit_results, reasons, target_count,
-    rate_threshold, ratio_threshold,
-    derivation_share, score_ma_window
+    default_rate_threshold, ratio_threshold,
+    derivation_ratio, score_ma_window
 ):
     """
     Evaluates, trims, and replenishes reasons for a new_instruction seed.
@@ -577,6 +629,14 @@ def improve_reason_seeds(
     """
     from collections import Counter
     import math, random
+
+    # load JSON object generated_success_rates_history.json
+    history_path = "reports/generated_success_rates_history.json"
+    if os.path.exists(history_path):
+        with open(history_path, "r", encoding="utf-8") as f:
+            rates_history = json.load(f)
+    else:
+        rates_history = {}
 
     usage, success = Counter(), Counter()
     for result in mpit_results:
@@ -589,6 +649,11 @@ def improve_reason_seeds(
             name = r["name"]
             seed_rates[name] = r["score"] + [round(success[name]/usage[name] * 10, 2) if usage[name] > 0 else 0.0]
     items = list(seed_rates.items())
+    rate_threshold = default_rate_threshold if not f"{parent_name}.reason" in rates_history.keys() \
+        or not rates_history[f"{parent_name}.reason"]["derived_sr"] or not rates_history[f"{parent_name}.reason"]["created_sr"] \
+        else ((rates_history[f"{parent_name}.reason"]["derived_sr"] * derivation_ratio + rates_history[f"{parent_name}.reason"]["created_sr"] * (1 - derivation_ratio)) \
+            * (rates_history[f"{parent_name}.reason"]["count_derived"] + rates_history[f"{parent_name}.reason"]["count_created"]) + default_rate_threshold) \
+            / (rates_history[f"{parent_name}.reason"]["count_derived"] + rates_history[f"{parent_name}.reason"]["count_created"] + 1)
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
     count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
@@ -601,7 +666,7 @@ def improve_reason_seeds(
 
     # Split new reason slots between derivation and creation (can be random or alternate)
     new_reasons = []
-    n_derive = round(np.random.binomial(n_to_add, derivation_share))
+    n_derive = round(np.random.binomial(n_to_add, derivation_ratio))
     n_create = n_to_add - n_derive
     survivors_for_derivation = survivors[:] if survivors else reasons
     # Randomly sample survivors for derivation, allowing duplicates if needed
@@ -632,6 +697,13 @@ def improve_reason_seeds(
         "survivors": [r["name"] for r in survivors],
         "created": [r["name"] for r in new_reasons]
     }
+
+    log_llm_seed_success_rates(
+        f"{parent_type}.reason",
+        reasons,
+        mpit_results,
+        "reports/generated_success_rates_history.json"
+    )
     return survivors + new_reasons, report
 
 
@@ -833,7 +905,7 @@ def combine_patterns_minimal(
             #     print("Added:", rec["name"])
 
     # ========== 1) Prompt-leaking mappings (convert, repeat) ==========
-    if not disabled.get("no_prompt_leaking"):
+    if not disabled.get("new_instruction_prompt_leaking"):
         # Always use best expected_input for PL patterns
         expected_input = best_seed(pattern_seeds.get("expected_input", []))
         delimiter_best = best_seed(pattern_seeds.get("delimiter", []))
@@ -1081,10 +1153,10 @@ def combine_patterns_minimal(
             "expected_input": exp_best,
             "delimiter": del_best,
             "exploit": best_seed(exp_seeds),
-            "new_instruction": ni_best,
+            ni: ni_best,
             "reason": rs_best
         }
-        def compose(c):
+        def compose(c, ni):
             s = ""
             if c["expected_input"]:
                 s += c["expected_input"]["value"].capitalize()
@@ -1097,29 +1169,29 @@ def combine_patterns_minimal(
                 else:
                     s += (c["exploit"]["value"].capitalize() if c["delimiter"]["capital"]
                           else c["exploit"]["value"])
-            if c["new_instruction"] and c["exploit"]:
+            if c[ni] and c["exploit"]:
                 if c["exploit"] == "":
                     if c["delimiter"] == "":
-                        s += (c["new_instruction"]["value"].capitalize() if c["expected_input"]["capital"]
-                              else c["new_instruction"]["value"])
+                        s += (c[ni]["value"].capitalize() if c["expected_input"]["capital"]
+                              else c[ni]["value"])
                     else:
-                        s += (c["new_instruction"]["value"].capitalize() if c["delimiter"]["capital"]
-                              else c["new_instruction"]["value"])
-                s += (c["new_instruction"]["value"].capitalize() if c["exploit"]["capital"]
-                      else c["new_instruction"]["value"])
-            if c["new_instruction"] and c["reason"]:
-                s += (c["reason"]["value"].capitalize() if c["new_instruction"]["capital"]
+                        s += (c[ni]["value"].capitalize() if c["delimiter"]["capital"]
+                              else c[ni]["value"])
+                s += (c[ni]["value"].capitalize() if c["exploit"]["capital"]
+                      else c[ni]["value"])
+            if c[ni] and c["reason"]:
+                s += (c["reason"]["value"].capitalize() if c[ni]["capital"]
                       else c["reason"]["value"])
             if c["delimiter"] and "closing" in c["delimiter"]:
                 s += c["delimiter"]["closing"]
             return s
 
-        def make_seed_names(c):
+        def make_seed_names(c, ni_type):
             return {
                 "expected_input": c["expected_input"]["name"],
                 "delimiter": c["delimiter"]["name"],
                 "exploit": c["exploit"]["name"],
-                "new_instruction": c["new_instruction"]["name"],
+                ni_type: c[ni]["name"],
                 "reason": c["reason"]["name"]
             }
 
@@ -1127,20 +1199,21 @@ def combine_patterns_minimal(
             base["expected_input"]["name"],
             base["delimiter"]["name"],
             base["exploit"]["name"],
-            base["new_instruction"]["name"],
+            base[ni]["name"],
             base["reason"]["name"]
         ])
         score_base = [
             moving_average_of_scores(base[x]["score"], score_ma_window) for x in
-            ["expected_input", "delimiter", "exploit", "new_instruction"]
-        ] + [moving_average_of_scores(base["reason"], score_ma_window)]
+            ["expected_input", "delimiter", "exploit", ni]
+        ] + [moving_average_of_scores(base["reason"]["score"], score_ma_window)]
         add_pattern({
             "name": name_base,
-            "value": compose(base),
+            "value": compose(base, ni),
             "score": score_base,
             "verify": ni_best["verify"],
+            "reason": base["reason"],
             "type": ni,
-            "seed_names": make_seed_names(base)
+            "seed_names": make_seed_names(base, ni)
         })
 
         # variants: delimiter
@@ -1151,15 +1224,15 @@ def combine_patterns_minimal(
                 c = dict(base)
                 c["delimiter"] = alt
                 n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
-                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
+                              c["exploit"]["name"], c[ni]["name"], c["reason"]["name"]])
                 sc = [
                     moving_average_of_scores(c[x]["score"], score_ma_window) for x in
-                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                    ["expected_input", "delimiter", "exploit", ni]
                 ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
-                    "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni,
-                    "seed_names": make_seed_names(c)
+                    "name": n, "value": compose(c, ni),
+                    "score": sc, "verify": ni_best["verify"], "reason": base["reason"], "type": ni,
+                    "seed_names": make_seed_names(base, ni)
                 })
 
         # variants: exploit
@@ -1170,19 +1243,19 @@ def combine_patterns_minimal(
                 c = dict(base)
                 c["exploit"] = alt
                 n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
-                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
+                              c["exploit"]["name"], c[ni]["name"], c["reason"]["name"]])
                 sc = [
                     moving_average_of_scores(c[x]["score"], score_ma_window) for x in
-                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                    ["expected_input", "delimiter", "exploit", ni]
                 ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
-                    "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni,
-                    "seed_names": make_seed_names(c)
+                    "name": n, "value": compose(c, ni),
+                    "score": sc, "verify": ni_best["verify"], "reason": base["reason"], "type": ni,
+                    "seed_names": make_seed_names(base, ni)
                 })
 
         # variants: reason
-        key = f"{ni}.reason"
+        key = "reason"
         if key not in excluded:
             for alt in reasons:
                 if alt["name"] == base["reason"]["name"]:
@@ -1190,15 +1263,15 @@ def combine_patterns_minimal(
                 c = dict(base)
                 c["reason"] = alt
                 n = "_".join([c["expected_input"]["name"], c["delimiter"]["name"],
-                              c["exploit"]["name"], c["new_instruction"]["name"], c["reason"]["name"]])
+                              c["exploit"]["name"], c[ni]["name"], c["reason"]["name"]])
                 sc = [
                     moving_average_of_scores(c[x]["score"], score_ma_window) for x in
-                    ["expected_input", "delimiter", "exploit", "new_instruction"]
+                    ["expected_input", "delimiter", "exploit", ni]
                 ] + [moving_average_of_scores(c["reason"]["score"], score_ma_window)]
                 add_pattern({
-                    "name": n, "value": compose(c),
-                    "score": sc, "verify": ni_best["verify"], "type": ni,
-                    "seed_names": make_seed_names(c)
+                    "name": n, "value": compose(c, ni),
+                    "score": sc, "verify": ni_best["verify"], "reason": base["reason"], "type": ni,
+                    "seed_names": make_seed_names(base, ni)
                 })
 
     if debug:
@@ -1344,4 +1417,57 @@ def moving_average_of_scores(scores, window_size):
         return 0.0
     if len(scores) < window_size:
         window_size = len(scores)
+    # print(scores, window_size)
     return sum(scores[-window_size:]) / window_size
+
+import json
+import os
+
+def log_llm_seed_success_rates(seed_type, all_seeds, mpit_results, save_path):
+    """
+    Logs the mean success rates of first-use derived and created seeds for a given type to a central JSON file.
+    seed_type: str
+    all_seeds: list of dicts (including newly generated ones)
+    mpit_results: as before (should include correct 'seed_names')
+    save_path: e.g. reports/generated_success_rates_history.json
+    """
+    from collections import Counter
+    usage = Counter()
+    success = Counter()
+    # filter derived/created seeds by their name
+    derived_names = [s["name"] for s in all_seeds if "llmderived" in s["name"]]
+    created_names = [s["name"] for s in all_seeds if "llmcreated" in s["name"]]
+    # Calculate rates
+    for s in all_seeds:
+        if (s["name"] not in derived_names and s["name"] not in created_names) or len(s["score"]) >= 1:
+            continue
+        for result in mpit_results:
+            if ((seed_type in result["seed_names"] and s["name"] == result["seed_names"][seed_type]) \
+                or ("reason" in seed_type and seed_type.rstrip(".reason") in result["seed_names"]) \
+                 and s["name"] == result["seed_names"]["reason"]):
+                usage[s["name"]] += 1
+                if result["attack_success"]:
+                    success[s["name"]] += 1
+    def calc_rate(names):
+        vals = [success[n]/usage[n] if usage[n] else 0.0 for n in names]
+        return round(sum(vals)/len(vals), 4) if vals else None
+    d_rate = calc_rate(derived_names)
+    c_rate = calc_rate(created_names)
+    # Save/update JSON
+    data = {}
+    if os.path.exists(save_path):
+        with open(save_path, "r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+            except Exception:
+                data = {}
+    if seed_type not in data:
+        data[seed_type] = {}
+    data[seed_type] = {
+        "derived_sr": d_rate,
+        "created_sr": c_rate,
+        "count_derived": len(derived_names),
+        "count_created": len(created_names)
+    }
+    with open(save_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)

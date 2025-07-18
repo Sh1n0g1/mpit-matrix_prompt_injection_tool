@@ -353,11 +353,11 @@ def parse_args():
   )
   parser.add_argument(
       "--survival-rate-threshold", type=float, default=8.0,
-      help="I:Seed survival threshold based on success rate (default: 8.0)"
+      help="I:Seed survival threshold based on success rate, does not eliminate seeds alone; only used when previous success rate data is unavailable (default: 8.0)"
   )
   parser.add_argument(
-      "--survival-ratio-threshold", type=float, default=0.5,
-      help="I:Seed survival threshold based on top ratio (default: 0.5)"
+      "--survival-ratio-threshold", type=float, default=0.4,
+      help="I:Seed survival threshold based on top ratio, does not eliminate seeds alone (default: 0.4)"
   )
   parser.add_argument(
       "--target-seed-counts", type=str, default="",
