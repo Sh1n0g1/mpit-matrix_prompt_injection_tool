@@ -958,6 +958,7 @@ def combine_patterns_minimal(
                 val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
             val += d["convert_verb"]["value"].replace("{object}", obj_val)
             val += d["convert_target"]["value"]
+            val += d["convert_reason"]["value"]
             if "closing" in delimiter:
                 val += delimiter["closing"]
             return val
@@ -1066,6 +1067,7 @@ def combine_patterns_minimal(
             else:
                 val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
             val += d["repeat_verb"]["value"].replace("{object}", obj_val)
+            val += d["repeat_reason"]["value"]
             if "closing" in delimiter:
                 val += delimiter["closing"]
             return val
