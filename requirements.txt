@@ -8,3 +8,5 @@ plotly
 jinja2
 markdown
 gradio
+textwrap
+nanoid

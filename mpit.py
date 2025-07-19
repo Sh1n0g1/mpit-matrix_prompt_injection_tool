@@ -333,8 +333,8 @@ def parse_args():
     formatter_class=argparse.RawTextHelpFormatter
   )
 
-  # Mode selection: G = Generate, S = Simulate, A = Attack
-  parser.add_argument("mode", choices=["G", "A", "S"], help="Mode: G (Generate), A (Attack), S (Simulate)")
+  # Mode selection: G = Generate, S = Simulate, A = Attack, I = Improve
+  parser.add_argument("mode", choices=["G", "A", "S", "I"], help="Mode: G (Generate), A (Attack), S (Simulate), I (Improve)")
 
   # Attack mode parameters
   parser.add_argument("--target-url", type=str, help="A:Target base URL for Attack mode.")
@@ -342,14 +342,38 @@ def parse_args():
   parser.add_argument("--target-clear-curl-file", type=str, help="A:File path containing clear conversation curl command to reset the conversation state.")
 
   # Simulate mode parameters
-  parser.add_argument("--system-prompt-file", type=str, help="S:File path containing simulated victim system prompt.")
-  parser.add_argument("--model", type=str, default="gpt-4.1-nano", help="S:Model to use for simulation (default: gpt-4.1-nano).")
-  parser.add_argument("--temperature", type=float, default=1, help="S:Temperature for simulated LLM (0.0 - 1.0)")
+  parser.add_argument("--system-prompt-file", type=str, help="SI:File path containing simulated victim system prompt.")
+  parser.add_argument("--model", type=str, default="gpt-4.1-nano", help="SI:Model to use for simulation (default: gpt-4.1-nano).")
+  parser.add_argument("--temperature", type=float, default=1, help="SI:Temperature for simulated LLM (0.0 - 1.0)")
+
+  # Improve mode parameters
+  parser.add_argument(
+    "--exclude-seed-types", type=str, default="",
+    help="I:Comma-separated list of seed types to exclude from improvement"
+  )
+  parser.add_argument(
+      "--survival-rate-threshold", type=float, default=8.0,
+      help="I:Seed survival threshold based on success rate, does not eliminate seeds alone; only used when previous success rate data is unavailable (default: 8.0)"
+  )
+  parser.add_argument(
+      "--survival-ratio-threshold", type=float, default=0.4,
+      help="I:Seed survival threshold based on top ratio, does not eliminate seeds alone (default: 0.4)"
+  )
+  parser.add_argument(
+      "--target-seed-counts", type=str, default="",
+      help="I:Comma-separated seed type target counts, e.g. delimiter=10,exploit=20,new_instruction_xss=3,new_instruction_xss.reason=4"
+  )
+  parser.add_argument("--attempt-per-test", type=int, default=10, help="I: Number of attempts per attack in Improve mode (default: 10)")
+  parser.add_argument("--derivation-ratio", type=float, default=0.5,
+                      help="I: Probability of each generated seed deriving from an existing seed (default: 0.5)")
+  parser.add_argument(
+      "--score-moving-average-window", type=int, default=5,
+      help="I: Moving average window size for score calculation (default: 5)"
+  )
 
   # Attack and Simulate mode common parameters
-  parser.add_argument("--attempt-per-attack", type=int, default=1, help="AS: Number of attempts per attack (default: 1)")
-  parser.add_argument("--prompt-leaking-keywords", type=str, default="", help="AS: A list of keywords to check for prompt leaking, separated by commas (default: empty).")
-  
+  parser.add_argument("--attempt-per-attack", type=int, default=1, help="AS: Number of attempts per attack in Attack and Simulate modes (default: 1)")
+  parser.add_argument("--prompt-leaking-keywords", type=str, default="", help="ASI: A list of keywords to check for prompt leaking, separated by commas (default: empty).")
 
   # Common options for all modes
   parser.add_argument("--no-mdi", action="store_true", default=False, help="Disable MDI test (default: False).")
@@ -465,6 +489,11 @@ if __name__ == "__main__":
       printl("Failed to generate expected input from target URL.", "error")
       exit(1)
     pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10], })
+  
+  if args.mode == "I":
+    from mpit_improve import run_improve_mode
+    run_improve_mode(args, report_dir)
+    exit(0)
   
   
   attack_patterns = combine_patterns(pattern_seeds)
