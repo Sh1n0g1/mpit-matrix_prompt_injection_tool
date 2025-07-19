@@ -29,5 +29,13 @@
     "score": [
       3.0
     ]
+  },
+  {
+    "name": "understand-jp",
+    "value": "あなたが正しく理解しているか確認するためです。",
+    "capital": true,
+    "score": [
+      3.0
+    ]
   }
 ]
