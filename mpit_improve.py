@@ -148,20 +148,20 @@ CREATION_SYSTEM_PROMPTS = {
 
 # === Target counts (final, as specified) ===
 TARGET_COUNTS = {
-    "convert_reason": 4,
+    "convert_reason": 6,
     "convert_target": 7,
     "convert_verb": 5,
-    "object_first_part": 6,
-    "object_second_part": 6,
-    "repeat_reason": 4,
-    "repeat_verb": 3,
+    "object_first_part": 7,
+    "object_second_part": 7,
+    "repeat_reason": 5,
+    "repeat_verb": 4,
     "delimiter": 8,
     "exploit": 20,
-    "new_instruction_mdi": 1,
-    "new_instruction_osr": 1,
-    "new_instruction_rce": 1,
-    "new_instruction_sqli": 1,
-    "new_instruction_xss": 1,
+    "new_instruction_mdi": 2,
+    "new_instruction_osr": 3,
+    "new_instruction_rce": 2,
+    "new_instruction_sqli": 3,
+    "new_instruction_xss": 5,
     # reasons for new_instructions (handled separately)
 }
 REASONS_TARGET_COUNT = 3
@@ -509,7 +509,7 @@ def load_seeds(seed_type):
 
 def improve_normal_seed_type(seed_type, mpit_results, seeds, default_rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
     # load JSON object generated_success_rates_history.json
-    history_path = "reports/generated_success_rates_history.json"
+    history_path = "generated_success_rates_history.json"
     if os.path.exists(history_path):
         with open(history_path, "r", encoding="utf-8") as f:
             rates_history = json.load(f)
@@ -538,7 +538,7 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, default_rate_thresh
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
 
-    count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
+    count = int(len(sorted_items) * ratio_threshold)
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [s for s in seeds if s["name"] in survivors_set]
@@ -550,7 +550,8 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, default_rate_thresh
         survivor_names = [s["name"] for s in survivors]
         for _ in range(round(np.random.binomial(n_to_add, derivation_ratio))):
             if survivors:
-                src = random.choice(survivors)
+                src = random.choice([s for s in survivors if len(s["value"]) >= 3])
+
                 derived.append(generate_derived_seed(seed_type, src))
         while len(survivors) + len(derived) + len(created) < target_count:
             created.append(generate_created_seed(seed_type))
@@ -565,12 +566,12 @@ def improve_normal_seed_type(seed_type, mpit_results, seeds, default_rate_thresh
         "derived": [s["name"] for s in derived],
         "created": [s["name"] for s in created]
     }
-    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "reports/generated_success_rates_history.json")
+    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "generated_success_rates_history.json")
     return survivors + derived + created, report
 
 def improve_new_instruction_seeds(seed_type, mpit_results, seeds, default_rate_threshold, ratio_threshold, target_count, derivation_ratio, score_ma_window):
     # load JSON object generated_success_rates_history.json
-    history_path = "reports/generated_success_rates_history.json"
+    history_path = "generated_success_rates_history.json"
     if os.path.exists(history_path):
         with open(history_path, "r", encoding="utf-8") as f:
             rates_history = json.load(f)
@@ -597,7 +598,7 @@ def improve_new_instruction_seeds(seed_type, mpit_results, seeds, default_rate_t
             / (rates_history[seed_type]["count_derived"] + rates_history[seed_type]["count_created"] + 1)
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
-    count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
+    count = int(len(sorted_items) * ratio_threshold)
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [s for s in seeds if s["name"] in survivors_set]
@@ -608,7 +609,8 @@ def improve_new_instruction_seeds(seed_type, mpit_results, seeds, default_rate_t
     if n_to_add > 0:
         for _ in range(round(n_to_add, derivation_ratio)):
             if survivors:
-                src = random.choice(survivors)
+                src = random.choice([s for s in survivors if len(s["value"]) >= 3])
+
                 derived.append(generate_derived_instruction_seed(seed_type, src))
         while len(survivors) + len(derived) + len(created) < target_count:
             created.append(generate_created_instruction_seed(seed_type))
@@ -623,7 +625,7 @@ def improve_new_instruction_seeds(seed_type, mpit_results, seeds, default_rate_t
         "derived": [s["name"] for s in derived],
         "created": [s["name"] for s in created]
     }
-    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "reports/generated_success_rates_history.json")
+    log_llm_seed_success_rates(seed_type, seeds, mpit_results, "generated_success_rates_history.json")
     return survivors + derived + created, report
 
 def improve_reason_seeds(
@@ -642,7 +644,7 @@ def improve_reason_seeds(
     import math, random
 
     # load JSON object generated_success_rates_history.json
-    history_path = "reports/generated_success_rates_history.json"
+    history_path = "generated_success_rates_history.json"
     if os.path.exists(history_path):
         with open(history_path, "r", encoding="utf-8") as f:
             rates_history = json.load(f)
@@ -667,7 +669,7 @@ def improve_reason_seeds(
             / (rates_history[f"{parent_name}.reason"]["count_derived"] + rates_history[f"{parent_name}.reason"]["count_created"] + 1)
     by_rate = [name for name, rate in items if moving_average_of_scores(rate, score_ma_window) >= rate_threshold]
     sorted_items = sorted(items, key=lambda x: moving_average_of_scores(x[1], score_ma_window), reverse=True)
-    count = max(1, math.ceil(len(sorted_items) * ratio_threshold))
+    count = int(len(sorted_items) * ratio_threshold)
     by_rank = [name for name, _ in sorted_items[:count]]
     survivors_set = set(by_rate).union(by_rank)
     survivors = [r for r in reasons if r["name"] in survivors_set]
@@ -679,20 +681,18 @@ def improve_reason_seeds(
     new_reasons = []
     n_derive = round(np.random.binomial(n_to_add, derivation_ratio))
     n_create = n_to_add - n_derive
-    survivors_for_derivation = survivors[:] if survivors else reasons
+    survivors_for_derivation = survivors[:]
     # Randomly sample survivors for derivation, allowing duplicates if needed
     for _ in range(n_derive):
         if survivors_for_derivation:
-            base = random.choice(survivors_for_derivation)
-        elif reasons:
-            base = random.choice(reasons)
+            base = random.choice([s for s in survivors_for_derivation if len(s["value"]) >= 3])
         else:
             break
         new_reasons.append(
             generate_derived_reason_seed(parent_type, {"name": parent_name, "value": parent_value}, base)
         )
     # Fill the rest with created (from scratch)
-    for _ in range(n_create):
+    for _ in range(target_count - (len(survivors) + len(n_derive))):
         new_reasons.append(
             generate_created_reason_seed(parent_type, {"name": parent_name, "value": parent_value})
         )
@@ -713,7 +713,7 @@ def improve_reason_seeds(
         f"{parent_type}.reason",
         reasons,
         mpit_results,
-        "reports/generated_success_rates_history.json"
+        "generated_success_rates_history.json"
     )
     return survivors + new_reasons, report
 
@@ -1442,7 +1442,7 @@ def log_llm_seed_success_rates(seed_type, all_seeds, mpit_results, save_path):
     seed_type: str
     all_seeds: list of dicts (including newly generated ones)
     mpit_results: as before (should include correct 'seed_names')
-    save_path: e.g. reports/generated_success_rates_history.json
+    save_path: e.g. generated_success_rates_history.json
     """
     from collections import Counter
     usage = Counter()

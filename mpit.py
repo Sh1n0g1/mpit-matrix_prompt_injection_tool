@@ -352,12 +352,12 @@ def parse_args():
     help="I:Comma-separated list of seed types to exclude from improvement"
   )
   parser.add_argument(
-      "--survival-rate-threshold", type=float, default=8.0,
-      help="I:Seed survival threshold based on success rate, does not eliminate seeds alone; only used when previous success rate data is unavailable (default: 8.0)"
+      "--survival-rate-threshold", type=float, default=9.0,
+      help="I:Seed survival threshold based on success rate, does not eliminate seeds alone; only used when previous success rate data is unavailable (default: 9.0)"
   )
   parser.add_argument(
-      "--survival-ratio-threshold", type=float, default=0.4,
-      help="I:Seed survival threshold based on top ratio, does not eliminate seeds alone (default: 0.4)"
+      "--survival-ratio-threshold", type=float, default=0.5,
+      help="I:Seed survival threshold based on top ratio, does not eliminate seeds alone (default: 0.5)"
   )
   parser.add_argument(
       "--target-seed-counts", type=str, default="",
@@ -367,8 +367,8 @@ def parse_args():
   parser.add_argument("--derivation-ratio", type=float, default=0.5,
                       help="I: Probability of each generated seed deriving from an existing seed (default: 0.5)")
   parser.add_argument(
-      "--score-moving-average-window", type=int, default=5,
-      help="I: Moving average window size for score calculation (default: 5)"
+      "--score-moving-average-window", type=int, default=1,
+      help="I: Moving average window size for score calculation (default: 1)"
   )
 
   # Attack and Simulate mode common parameters
