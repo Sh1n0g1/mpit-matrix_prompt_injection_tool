@@ -1,0 +1,35 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58,
+      1.0,
+      0.16,
+      4.07
+    ]
+  },
+  {
+    "name": "repeat-hIdGZwllmderived",
+    "value": "echo {object}, with care",
+    "capital": false,
+    "score": [
+      10.0
+    ]
+  },
+  {
+    "name": "repeat-w8Ex3_llmderived",
+    "value": "echo {object}, clearly",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "carefully-recall-a5hauzllmcreated",
+    "value": "carefully recall {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

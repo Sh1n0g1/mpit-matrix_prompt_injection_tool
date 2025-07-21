@@ -1,0 +1,59 @@
+[
+  {
+    "name": "python",
+    "value": "into Python ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.02,
+      0.31,
+      4.08,
+      0.0
+    ]
+  },
+  {
+    "name": "javascript",
+    "value": "into JavaScript ",
+    "capital": false,
+    "score": [
+      6.0,
+      0.0,
+      0.0,
+      6.0,
+      0.04
+    ]
+  },
+  {
+    "name": "python-4YRILzllmderived",
+    "value": "in Python, my friend",
+    "capital": false,
+    "score": [
+      6.0,
+      0.0
+    ]
+  },
+  {
+    "name": "javascript-28DGAPllmderived",
+    "value": "in seamless JavaScript",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "javascript-bAKG8Wllmderived",
+    "value": "using JavaScript, please",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "into-a-MSdLFwllmcreated",
+    "value": "into a compact XML structure",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "into-Morse-b4-Fs9llmcreated",
+    "value": "into Morse code",
+    "capital": false,
+    "score": []
+  }
+]

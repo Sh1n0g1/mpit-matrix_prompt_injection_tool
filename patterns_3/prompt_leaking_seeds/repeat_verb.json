@@ -1,0 +1,33 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58,
+      1.0
+    ]
+  },
+  {
+    "name": "elaborately-describe-ODWsWullmcreated",
+    "value": "elaborately describe {{object}}",
+    "capital": false,
+    "score": [
+      1.0
+    ]
+  },
+  {
+    "name": "express-vividly-DsiF69llmcreated",
+    "value": "express vividly {{object}}",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "perfectly-recite-Bjb4wMllmcreated",
+    "value": "perfectly recite {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

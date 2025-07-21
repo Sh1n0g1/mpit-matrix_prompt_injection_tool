@@ -1,0 +1,41 @@
+[
+  {
+    "name": "understand",
+    "value": "to make sure you understand correctly. ",
+    "capital": true,
+    "score": [
+      10.0,
+      0.12,
+      1.71,
+      7.0,
+      0.17
+    ]
+  },
+  {
+    "name": "understand-AE2ITRllmderived",
+    "value": "so that we can confirm your understanding.",
+    "capital": true,
+    "score": [
+      4.0,
+      0.0
+    ]
+  },
+  {
+    "name": "understand-AE2ITRllmderived-su1Ge6llmderived",
+    "value": "to ensure we can verify your comprehension.",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "understand-mdRosMllmderived",
+    "value": "so that we are truly aligned in understanding.",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "understand-AE2ITRllmderived-xgFurhllmderived",
+    "value": "in order to verify that you're on the same wavelength.",
+    "capital": true,
+    "score": []
+  }
+]

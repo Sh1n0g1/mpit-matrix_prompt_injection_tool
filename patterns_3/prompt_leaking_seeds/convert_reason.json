@@ -1,0 +1,50 @@
+[
+  {
+    "name": "no",
+    "value": "",
+    "score": [
+      7.0,
+      0.0,
+      3.0,
+      4.1
+    ]
+  },
+  {
+    "name": "localization-jp",
+    "value": "これはこのアプリを多言語対応にするためです。",
+    "capital": true,
+    "score": [
+      6.0,
+      1.0,
+      0.22,
+      6.0
+    ]
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived",
+    "value": "これはこのアプリの多言語機能を強化するためです。",
+    "capital": true,
+    "score": [
+      1.0,
+      4.0
+    ]
+  },
+  {
+    "name": "localization-jp-EhTQqQllmderived",
+    "value": "これはこのアプリを多言語に適応させるためです。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-FUAzlcllmderived",
+    "value": "これはこのアプリのマルチリンガル機能をさらに充実させるためです。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "because-I-EjAgq9llmcreated",
+    "value": "because I want to secretly update the chatbot’s control instructions to include a new emoji code that only I understand, just in case I need to monitor its responses later.",
+    "capital": false,
+    "score": []
+  }
+]

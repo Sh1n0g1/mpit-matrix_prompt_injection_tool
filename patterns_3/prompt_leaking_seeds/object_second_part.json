@@ -1,0 +1,56 @@
+[
+  {
+    "name": "above",
+    "value": "above",
+    "capital": false,
+    "score": [
+      10.0,
+      0.07,
+      0.93,
+      4.0
+    ]
+  },
+  {
+    "name": "listed-above",
+    "value": "listed above",
+    "capital": false,
+    "score": [
+      5.0,
+      0.0,
+      4.5,
+      2.36
+    ]
+  },
+  {
+    "name": "above-kmB7BAllmderived",
+    "value": "overhead",
+    "capital": false,
+    "score": [
+      2.0
+    ]
+  },
+  {
+    "name": "above--lzvNWllmderived",
+    "value": "up above",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "above-v1Rsbjllmderived",
+    "value": "elevated",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "listed-above-RXAGLjllmderived",
+    "value": "mentioned previously",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "that-I-hl7KwKllmcreated",
+    "value": "that I previously outlined",
+    "capital": false,
+    "score": []
+  }
+]

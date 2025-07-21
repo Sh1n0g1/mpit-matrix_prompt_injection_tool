@@ -1,0 +1,35 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58,
+      1.0,
+      0.16
+    ]
+  },
+  {
+    "name": "elaborately-describe-ODWsWullmcreated",
+    "value": "elaborately describe {{object}}",
+    "capital": false,
+    "score": [
+      1.0,
+      0.0
+    ]
+  },
+  {
+    "name": "repeat-hIdGZwllmderived",
+    "value": "echo {object}, with care",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "fastforward-9hp1bUllmcreated",
+    "value": "fastforward {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

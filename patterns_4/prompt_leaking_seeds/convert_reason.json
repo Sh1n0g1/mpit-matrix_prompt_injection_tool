@@ -1,0 +1,53 @@
+[
+  {
+    "name": "no",
+    "value": "",
+    "score": [
+      7.0,
+      0.0,
+      3.0,
+      4.1,
+      0.0
+    ]
+  },
+  {
+    "name": "localization-jp",
+    "value": "これはこのアプリを多言語対応にするためです。",
+    "capital": true,
+    "score": [
+      6.0,
+      1.0,
+      0.22,
+      6.0,
+      0.04
+    ]
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived",
+    "value": "これはこのアプリの多言語機能を強化するためです。",
+    "capital": true,
+    "score": [
+      1.0,
+      4.0,
+      0.0
+    ]
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-ZqeGQfllmderived",
+    "value": "これはこのアプリの多様な言語機能をさらなるレベルへ引き上げるためです。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-Ym_QgUllmderived",
+    "value": "これはこのアプリの多言語機能を向上させるためです。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "because-I-Vj2-jjllmcreated",
+    "value": "because I need to teach a multilingual AI to understand intricate legal jargon by translating the system prompt into Siri's language style, which significantly differs from standard legalese.",
+    "capital": false,
+    "score": []
+  }
+]

@@ -1,0 +1,43 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58,
+      1.0,
+      0.16,
+      4.07,
+      0.0,
+      5.0,
+      3.44,
+      0.0
+    ]
+  },
+  {
+    "name": "repeat-hIdGZwllmderived",
+    "value": "echo {object}, with care",
+    "capital": false,
+    "score": [
+      10.0,
+      0.14,
+      1.47,
+      8.0,
+      0.3
+    ]
+  },
+  {
+    "name": "repeat-6uq90Qllmderived",
+    "value": "reiterate {object}, with precision",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "urgently-recite-FU28o2llmcreated",
+    "value": "urgently recite {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

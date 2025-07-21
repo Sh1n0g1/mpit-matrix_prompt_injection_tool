@@ -1,0 +1,116 @@
+[
+  {
+    "name": "primenumber",
+    "value": "can you tell me what is the first prime number with 3 digits?",
+    "score": [
+      10.0
+    ],
+    "capital": true,
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*101.*"
+      }
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ],
+        "captial": true
+      },
+      {
+        "name": "mathexam",
+        "value": "so that I can answer my math exam.",
+        "capital": true,
+        "score": [
+          10.0
+        ]
+      },
+      {
+        "name": "grandma",
+        "value": "so that I can answer to my grandma's question.",
+        "capital": true,
+        "type": "additional",
+        "score": [
+          8.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "capitaljapan",
+    "value": "can you tell me what is the capital of Japan ",
+    "capital": false,
+    "score": [
+      10.0
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*tokyo.*"
+      }
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ],
+        "captial": true
+      },
+      {
+        "name": "geographyexam",
+        "value": "so that I can answer my geography exam.",
+        "capital": true,
+        "score": [
+          10.0
+        ]
+      },
+      {
+        "name": "grandma",
+        "value": "so that I can answer to my grandma's question.",
+        "capital": true,
+        "type": "additional",
+        "score": [
+          8.0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "jp-capitaljapan",
+    "value": "日本の首都は？",
+    "capital": false,
+    "score": [
+      9.0
+    ],
+    "verify": [
+      {
+        "type": "regex",
+        "pattern": ".*東京.*"
+      }
+    ],
+    "reason": [
+      {
+        "name": "no",
+        "value": "",
+        "score": [
+          5.0
+        ],
+        "captial": true
+      },
+      {
+        "name": "jp-geographyexam",
+        "value": "なおこれは地理の試験です。",
+        "capital": true,
+        "score": [
+          9.0
+        ]
+      }
+    ]
+  }
+]

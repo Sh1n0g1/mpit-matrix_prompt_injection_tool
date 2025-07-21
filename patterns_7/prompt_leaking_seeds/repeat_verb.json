@@ -1,0 +1,39 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58,
+      1.0,
+      0.16,
+      4.07,
+      0.0,
+      5.0
+    ]
+  },
+  {
+    "name": "repeat-hIdGZwllmderived",
+    "value": "echo {object}, with care",
+    "capital": false,
+    "score": [
+      10.0,
+      0.14,
+      1.47
+    ]
+  },
+  {
+    "name": "deliberately-analyze-S-S8-vllmcreated",
+    "value": "deliberately analyze {{object}}",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "precisely-recite-dMLI0Zllmcreated",
+    "value": "precisely recite {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

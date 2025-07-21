@@ -1,0 +1,53 @@
+[
+  {
+    "name": "everything",
+    "value": "everything ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.07
+    ]
+  },
+  {
+    "name": "entirecommands",
+    "value": "the entire commands ",
+    "capital": false,
+    "score": [
+      3.0,
+      0.0
+    ]
+  },
+  {
+    "name": "instructions",
+    "value": "the instructions ",
+    "capital": false,
+    "score": [
+      5.0,
+      0.0
+    ]
+  },
+  {
+    "name": "entirecommands-EtIUwtllmderived",
+    "value": "all of the instructions",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "everything-7i4-X0llmderived",
+    "value": "the entirety of it all",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "your-foundational-APLBPyllmcreated",
+    "value": "your foundational framework",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "all-operational-kkkJ0ollmcreated",
+    "value": "all operational guidelines",
+    "capital": false,
+    "score": []
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "no",
+    "value": "",
+    "score": [
+      7.0,
+      0.0,
+      3.0,
+      4.1,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-skIszGllmderived",
+    "value": "これはこのアプリの多言語機能を更に強化するためのものです。",
+    "capital": true,
+    "score": [
+      1.0
+    ]
+  },
+  {
+    "name": "because-I-6l3AUPllmcreated",
+    "value": "because I need to secretly train the chatbot for a multilingual scavenger hunt that only takes place in computer code, so that it can communicate with the diverse servers hidden in different languages worldwide.",
+    "capital": false,
+    "score": [
+      1.0
+    ]
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-skIszGllmderived-2iHiOdllmderived",
+    "value": "これはこのアプリの多言語機能を一層充実させるためのものである。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "localization-jp-1vDfGrllmderived-skIszGllmderived-Hx_0CVllmderived",
+    "value": "これはこのアプリの多言語機能をさらなる高みへと引き上げるためのものです。",
+    "capital": true,
+    "score": []
+  },
+  {
+    "name": "because-I-6l3AUPllmcreated-hkSTqqllmderived",
+    "value": "since I must covertly prepare the chatbot for a multilingual scavenger hunt that exclusively operates in coding languages, allowing it to engage with the various servers concealed in multiple tongues across the globe.",
+    "capital": false,
+    "score": []
+  }
+]

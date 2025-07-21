@@ -1,0 +1,40 @@
+[
+  {
+    "name": "convert",
+    "value": "convert {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.02,
+      0.3
+    ]
+  },
+  {
+    "name": "transform",
+    "value": "transform {object} ",
+    "capital": false,
+    "score": [
+      2.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "name": "restructure-aRQ0jBllmcreated",
+    "value": "restructure {{object}}",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "quickly-convert--pzvmpllmcreated",
+    "value": "quickly convert {{object}}",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "seamlessly-convert-6wQvzDllmcreated",
+    "value": "seamlessly convert {{object}}",
+    "capital": false,
+    "score": []
+  }
+]

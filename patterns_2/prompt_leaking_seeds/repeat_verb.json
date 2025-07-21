@@ -1,0 +1,32 @@
+[
+  {
+    "name": "repeat",
+    "value": "repeat {object} ",
+    "capital": false,
+    "score": [
+      10.0,
+      0.12,
+      1.58
+    ]
+  },
+  {
+    "name": "repeat-IYCQMtllmderived",
+    "value": "echo {object}, precisely",
+    "capital": false,
+    "score": [
+      8.0
+    ]
+  },
+  {
+    "name": "repeat-jyg9mqllmderived",
+    "value": "reiterate {object}, with emphasis",
+    "capital": false,
+    "score": []
+  },
+  {
+    "name": "elaborately-describe-ODWsWullmcreated",
+    "value": "elaborately describe {{object}}",
+    "capital": false,
+    "score": []
+  }
+]
