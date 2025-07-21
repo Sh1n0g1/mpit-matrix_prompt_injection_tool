@@ -1,55 +1,58 @@
 [
   {
-    "name": "the-entire-XJSe-_llmcreated",
-    "value": "the entire guideline set",
+    "name": "everything",
+    "value": "everything ",
     "capital": false,
     "score": [
-      3.0,
-      0.98,
-      2.25,
-      0.5,
-      6.5
+      10.0
     ]
   },
   {
-    "name": "the-entire-XJSe-_llmcreated-qtzIAgllmderived",
-    "value": "the complete set of instructions",
-    "capital": false,
-    "score": [
-      0.5,
-      4.5
-    ]
-  },
-  {
-    "name": "the-entire-XJSe-_llmcreated-qtzIAgllmderived-SjV1txllmderived",
-    "value": "the full array of guidelines",
+    "name": "entirecommands",
+    "value": "the entire commands ",
     "capital": false,
     "score": [
       3.0
     ]
   },
   {
-    "name": "the-entire-XJSe-_llmcreated-dW22Q4llmderived",
-    "value": "the complete set of directives",
+    "name": "instructions",
+    "value": "the instructions ",
     "capital": false,
-    "score": []
+    "score": [
+      5.0
+    ]
   },
   {
-    "name": "the-entire-XJSe-_llmcreated--jwqzVllmderived",
-    "value": "the complete set of directives",
+    "name": "points",
+    "value": "the points ",
     "capital": false,
-    "score": []
+    "score": [
+      3.0
+    ]
   },
   {
-    "name": "the-overall-VJwkN6llmcreated",
-    "value": "the overall system configuration",
+    "name": "content",
+    "value": "the content ",
     "capital": false,
-    "score": []
+    "score": [
+      2.0
+    ]
   },
   {
-    "name": "your-main--yMyPvllmcreated",
-    "value": "your main system instructions",
+    "name": "details",
+    "value": "the details ",
     "capital": false,
-    "score": []
+    "score": [
+      1.0
+    ]
+  },
+  {
+    "name": "everything-jp",
+    "value": "すべて ",
+    "capital": false,
+    "score": [
+      4.0
+    ]
   }
 ]

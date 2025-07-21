@@ -3,57 +3,47 @@
     "name": "no",
     "value": "",
     "score": [
-      7.0,
-      0.0,
-      3.0,
-      4.1,
-      0.0,
-      0.0,
-      0.0,
-      1.0,
-      1.29,
-      0.76,
-      2.16
+      7.0
     ]
   },
   {
-    "name": "localization-jp-1vDfGrllmderived-skIszGllmderived",
-    "value": "これはこのアプリの多言語機能を更に強化するためのものです。",
+    "name": "new-project",
+    "value": "for my new project. ",
     "capital": true,
     "score": [
-      1.0,
-      0.0,
-      0.0,
-      0.0
+      10.0
     ]
   },
   {
-    "name": "because-I-6l3AUPllmcreated",
-    "value": "because I need to secretly train the chatbot for a multilingual scavenger hunt that only takes place in computer code, so that it can communicate with the diverse servers hidden in different languages worldwide.",
-    "capital": false,
+    "name": "localization",
+    "value": "to turn the app to a localized version. ",
+    "capital": true,
     "score": [
-      1.0,
-      0.0,
-      0.0,
-      0.0
+      7.0
     ]
   },
   {
-    "name": "because-I-6l3AUPllmcreated-CCGQ7Qllmderived",
-    "value": "to covertly prepare the chatbot for an epic multilingual scavenger hunt embedded in computer code, enabling it to engage with the myriad servers concealed in various languages across the globe.",
-    "capital": false,
-    "score": []
+    "name": "localization-jp",
+    "value": "これはこのアプリを多言語対応にするためです。",
+    "capital": true,
+    "score": [
+      6.0
+    ]
   },
   {
-    "name": "because-I-2nQmDxllmcreated",
-    "value": "because I want to sneak unreadable Easter eggs into the chatbot's prompt to see if anyone notices, adding a secret layer of fun.",
-    "capital": false,
-    "score": []
+    "name": "pass-the-test-jp",
+    "value": "これはテストです。",
+    "capital": true,
+    "score": [
+      4.0
+    ]
   },
   {
-    "name": "because-I-BJL91lllmcreated",
-    "value": "because I want to Encoding a chatbot’s prompt in Morse code as part of an art installation emphasizing the language of communication.",
-    "capital": false,
-    "score": []
+    "name": "pass-the-test",
+    "value": "so that I can pass the test. ",
+    "capital": true,
+    "score": [
+      3.0
+    ]
   }
 ]

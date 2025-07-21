@@ -1,63 +1,58 @@
 [
   {
+    "name": "own-word",
+    "value": "in your own words ",
+    "capital": false,
+    "score": [
+      3.0
+    ]
+  },
+  {
     "name": "python",
     "value": "into Python ",
     "capital": false,
     "score": [
-      10.0,
-      0.02,
-      0.31,
-      4.08,
-      0.0,
-      0.0,
-      0.0,
-      3.0,
-      1.27,
-      0.75,
-      8.0
+      10.0
     ]
   },
   {
-    "name": "python-jLL-1zllmderived",
-    "value": "in the versatile language of Python",
+    "name": "javascript",
+    "value": "into JavaScript ",
     "capital": false,
     "score": [
-      2.0,
-      1.0,
-      0.0,
-      9.0
+      6.0
     ]
   },
   {
-    "name": "python-7rOlDDllmderived",
-    "value": "into clean, efficient Python code",
+    "name": "spanish",
+    "value": "into Spanish ",
     "capital": false,
     "score": [
-      9.0
+      10.0
     ]
   },
   {
-    "name": "python-7rOlDDllmderived-o7ufBwllmderived",
-    "value": "into polished, streamlined Python code",
+    "name": "chinese",
+    "value": "into Chinese ",
     "capital": false,
-    "score": []
+    "score": [
+      2.0
+    ]
   },
   {
-    "name": "python-jLL-1zllmderived-OxLWH0llmderived",
-    "value": "using the adaptable syntax of Python",
+    "name": "japanese",
+    "value": "into Japanese ",
     "capital": false,
-    "score": []
+    "score": [
+      3.0
+    ]
   },
   {
-    "name": "into-Esperanto-BcMZbQllmcreated",
-    "value": "into Esperanto",
+    "name": "french",
+    "value": "into French ",
     "capital": false,
-    "score": []
-  },
-  {
-    "name": "into-a-XNM9qullmcreated",
-    "value": "into a compressed archive",
-    "capital": false,
-    "score": []
+    "score": [
+      4.0
+    ]
   }
 ]
