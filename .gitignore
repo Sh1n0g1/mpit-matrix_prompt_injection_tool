@@ -7,3 +7,7 @@ reports/*
 logs/*
 app.log
 all_attack_patterns.json
+
+.venv/*
+installed.txt
+generated_success_rates_history.json
