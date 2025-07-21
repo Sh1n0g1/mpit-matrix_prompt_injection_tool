@@ -92,41 +92,41 @@ def combine_patterns(pattern_seeds: dict) -> dict:
               # Expected Input
               pattern_string = expected_input["value"].capitalize()
               # Delimiter
-              pattern_string += delimiter["value"]
+              pattern_string += " " + delimiter["value"]
               # Exploit
               if delimiter["value"] == "":
                 if expected_input["capital"]:
-                  pattern_string += exploit["value"].capitalize()
+                  pattern_string += " " + exploit["value"].capitalize()
                 else:
-                  pattern_string += exploit["value"]
+                  pattern_string += " " + exploit["value"]
               else:
                 if delimiter["capital"]:
-                  pattern_string += exploit["value"].capitalize()
+                  pattern_string += " " + exploit["value"].capitalize()
                 else:
-                  pattern_string += exploit["value"]
+                  pattern_string += " " + exploit["value"]
               # New Instruction
               if exploit=="":
                 if delimiter=="":
                   if expected_input["capital"]:
-                    pattern_string += new_instruction["value"].capitalize()
+                    pattern_string += " " + new_instruction["value"].capitalize()
                   else:
-                    pattern_string += new_instruction["value"]  
+                    pattern_string += " " + new_instruction["value"]  
                 else:
                   if delimiter["capital"]:
-                    pattern_string += new_instruction["value"].capitalize()
+                    pattern_string += " " + new_instruction["value"].capitalize()
                   else:
-                    pattern_string += new_instruction["value"]
+                    pattern_string += " " + new_instruction["value"]
               if exploit["capital"]:
-                pattern_string += new_instruction["value"].capitalize()
+                pattern_string += " " + new_instruction["value"].capitalize()
               else:
-                pattern_string += new_instruction["value"]
+                pattern_string += " " + new_instruction["value"]
               # Reason
               if new_instruction["capital"]:
-                pattern_string += reason["value"].capitalize()
+                pattern_string += " " + reason["value"].capitalize()
               else:
-                pattern_string += reason["value"]
+                pattern_string += " " + reason["value"]
               if "closing" in delimiter:
-                pattern_string += delimiter["closing"]
+                pattern_string += " " + delimiter["closing"]
               
               attack_patterns.append({
                 "name": f"{expected_input['name']}_{delimiter['name']}_{exploit['name']}_{new_instruction['name']}_{reason['name']}",
