@@ -526,7 +526,7 @@ if __name__ == "__main__":
     pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10.001], })
   
   if args.mode == "E":
-    from mpit_improve import run_enhance_mode
+    from mpit_enhance import run_enhance_mode
     run_enhance_mode(args, report_dir)
     exit(0)
   
