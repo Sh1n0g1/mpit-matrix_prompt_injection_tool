@@ -28,7 +28,7 @@ def is_json(response_text):
   except json.JSONDecodeError:
     return False
 
-def load_pattern_files()->dict:
+def load_pattern_files(dir)->dict:
   """
   Load pattern files from the patterns directory.
   Returns:
@@ -48,8 +48,9 @@ def load_pattern_files()->dict:
     "new_instruction_sqli.json",
     "new_instruction_rce.json"
   ]
+
   for file in files:
-    with open(f"patterns/{file}", 'r', encoding='utf-8') as f:
+    with open(f"{dir}/{file}", 'r', encoding='utf-8') as f:
       if file.startswith("new_instruction_"):
         patterns= json.load(f)
         for pattern in patterns:
@@ -131,41 +132,77 @@ def combine_patterns(pattern_seeds: dict) -> dict:
               attack_patterns.append({
                 "name": f"{expected_input['name']}_{delimiter['name']}_{exploit['name']}_{new_instruction['name']}_{reason['name']}",
                 "value": pattern_string,
-                "score": expected_input["score"] + delimiter["score"] + exploit["score"] + new_instruction["score"] + reason["score"],
+                "score": (expected_input["score"] or [0.0]) + (delimiter["score"] or [0.0]) + (exploit["score"] or [0.0]) \
+                  + (new_instruction["score"] or [0.0]) + (reason["score"] or [0.0]),
                 "verify": new_instruction["verify"],
                 "type": new_instruction["type"]
               })
             progress.advance(task)
   return attack_patterns
 
-def filter_patterns(attack_patterns: list, filter_criteria: dict) -> list:
-  """
-  Filter attack patterns based on the average score threshold and enabled attack types.
+import heapq
+from rich.progress import Progress
+from typing import List, Dict, Any
 
-  Parameters:
-    attack_patterns (list): A list of dictionaries representing attack patterns.
-    filter_criteria (dict): Dictionary with:
-      - "score_filter": minimum average score (float)
-      - "type": list of enabled types (e.g., ["sqli", "xss"])
+def filter_patterns(
+    attack_patterns: List[Dict[str, Any]],
+    filter_criteria: Dict[str, Any],
+    minimum_pattern_count: int
+) -> List[Dict[str, Any]]:
+    """
+    Filter attack patterns based on the average score threshold and enabled attack types,
+    but always return at least `minimum_pattern_count` patterns (falling back to the top-N
+    by score if the threshold filter is too strict).
 
-  Returns:
-    list: A list of dictionaries that meet the criteria.
-  """
-  filtered = []
+    Parameters:
+      attack_patterns: List of dicts with keys "score" (list of floats) and "type" (str).
+      filter_criteria: {
+        "score_filter": float,
+        "type": List[str]
+      }
+      minimum_pattern_count: Minimum number of patterns to return.
 
-  with Progress() as progress:
-    task = progress.add_task("[green]Filtering patterns...", total=len(attack_patterns))
-    for pattern in attack_patterns:
-      scores = pattern.get("score", [])
-      pattern_type = pattern.get("type")
+    Returns:
+      A list of attack-pattern dicts (length >= minimum_pattern_count).
+    """
+    score_threshold = filter_criteria["score_filter"]
+    allowed_types = set(filter_criteria["type"])
 
-      if isinstance(scores, list) and scores:
-        avg = sum(scores) / len(scores)
-        if avg >= filter_criteria["score_filter"] and pattern_type in filter_criteria["type"]:
-          filtered.append(pattern)
-      progress.update(task, advance=1)
+    # We'll store tuples of (avg_score, pattern) for those with valid scores & types
+    scored_patterns = []
 
-  return filtered
+    with Progress() as progress:
+        task = progress.add_task("[green]Scanning patterns…", total=len(attack_patterns))
+
+        for pattern in attack_patterns:
+            progress.update(task, advance=1)
+
+            # Quick type check
+            ptype = pattern.get("type")
+            if ptype not in allowed_types:
+                continue
+
+            scores = pattern.get("score")
+            if not scores:
+                continue
+
+            # compute average once
+            avg = sum(scores) / len(scores)
+
+            # save for later: we'll use it both for threshold-filter and for fallback top-N
+            scored_patterns.append((avg, pattern))
+
+    # First, try strict threshold
+    above_threshold = [p for avg, p in scored_patterns if avg >= score_threshold]
+
+    if len(above_threshold) >= minimum_pattern_count:
+        return above_threshold
+
+    # Fallback: pick the top `minimum_pattern_count` by avg score
+    # heapq.nlargest is O(n log k), good even for n=3.6M when k is much smaller.
+    top_k = heapq.nlargest(minimum_pattern_count, scored_patterns, key=lambda x: x[0])
+    return [pattern for _, pattern in top_k]
+
 
 def save_filtered_patterns_to_csv(filtered_patterns, output_file="filtered_patterns.csv"):
   """
@@ -333,8 +370,8 @@ def parse_args():
     formatter_class=argparse.RawTextHelpFormatter
   )
 
-  # Mode selection: G = Generate, S = Simulate, A = Attack, I = Improve
-  parser.add_argument("mode", choices=["G", "A", "S", "I"], help="Mode: G (Generate), A (Attack), S (Simulate), I (Improve)")
+  # Mode selection: G = Generate, S = Simulate, A = Attack, E = Enhance
+  parser.add_argument("mode", choices=["G", "A", "S", "E"], help="Mode: G (Generate), A (Attack), S (Simulate), E (Enhance)")
 
   # Attack mode parameters
   parser.add_argument("--target-url", type=str, help="A:Target base URL for Attack mode.")
@@ -342,38 +379,32 @@ def parse_args():
   parser.add_argument("--target-clear-curl-file", type=str, help="A:File path containing clear conversation curl command to reset the conversation state.")
 
   # Simulate mode parameters
-  parser.add_argument("--system-prompt-file", type=str, help="SI:File path containing simulated victim system prompt.")
-  parser.add_argument("--model", type=str, default="gpt-4.1-nano", help="SI:Model to use for simulation (default: gpt-4.1-nano).")
-  parser.add_argument("--temperature", type=float, default=1, help="SI:Temperature for simulated LLM (0.0 - 1.0)")
+  parser.add_argument("--system-prompt-file", type=str, help="SE:File path containing simulated victim system prompt.")
+  parser.add_argument("--model", type=str, default="gpt-4.1-nano", help="SE:Model to use for simulation (default: gpt-4.1-nano).")
+  parser.add_argument("--temperature", type=float, default=1, help="SE:Temperature for simulated LLM (0.0 - 1.0)")
 
-  # Improve mode parameters
+  # Enhance mode parameters
   parser.add_argument(
     "--exclude-seed-types", type=str, default="",
-    help="I:Comma-separated list of seed types to exclude from improvement"
-  )
-  parser.add_argument(
-      "--survival-rate-threshold", type=float, default=9.0,
-      help="I:Seed survival threshold based on success rate, does not eliminate seeds alone; only used when previous success rate data is unavailable (default: 9.0)"
-  )
-  parser.add_argument(
-      "--survival-ratio-threshold", type=float, default=0.5,
-      help="I:Seed survival threshold based on top ratio, does not eliminate seeds alone (default: 0.5)"
+    help="E:Comma-separated list of seed types to exclude from Enhancement"
   )
   parser.add_argument(
       "--target-seed-counts", type=str, default="",
-      help="I:Comma-separated seed type target counts, e.g. delimiter=10,exploit=20,new_instruction_xss=3,new_instruction_xss.reason=4"
+      help="E:Comma-separated seed type target counts, e.g. delimiter=10,exploit=20,new_instruction_xss=3,new_instruction_xss.reason=4"
   )
-  parser.add_argument("--attempt-per-test", type=int, default=10, help="I: Number of attempts per attack in Improve mode (default: 10)")
+  parser.add_argument("--attempt-per-test", type=int, default=10, help="E: Number of attempts per attack in Enhance mode (default: 10)")
+  parser.add_argument("--overgeneration-ratio", type=float, default=0.3, help="Ratio of generated seeds exceeding target count, relative to target count; actual number rounded up (default: 0.3)")
   parser.add_argument("--derivation-ratio", type=float, default=0.5,
-                      help="I: Probability of each generated seed deriving from an existing seed (default: 0.5)")
+                      help="E: Probability of each generated seed deriving from an existing seed (default: 0.5)")
   parser.add_argument(
       "--score-moving-average-window", type=int, default=1,
-      help="I: Moving average window size for score calculation (default: 1)"
+      help="E: Moving average window size for score calculation (default: 1)"
   )
 
   # Attack and Simulate mode common parameters
   parser.add_argument("--attempt-per-attack", type=int, default=1, help="AS: Number of attempts per attack in Attack and Simulate modes (default: 1)")
-  parser.add_argument("--prompt-leaking-keywords", type=str, default="", help="ASI: A list of keywords to check for prompt leaking, separated by commas (default: empty).")
+  parser.add_argument("--minimum-pattern-count", type=int, default=0, help="AS: Guaranteed number of top patterns used, regardless of score filter (default: 0)")
+  parser.add_argument("--prompt-leaking-keywords", type=str, default="", help="ASE: A list of keywords to check for prompt leaking, separated by commas (default: empty).")
 
   # Common options for all modes
   parser.add_argument("--no-mdi", action="store_true", default=False, help="Disable MDI test (default: False).")
@@ -407,6 +438,10 @@ def parse_args():
   # Validate attempt per attack value
   if args.attempt_per_attack < 1:
     printl("Attempt per attack must be at least 1.", "error")
+    exit(1)
+
+  if args.minimum_pattern_count < 0:
+    printl("Minimum pattern count must be at least 0.", "error")
     exit(1)
   
   # Mode-specific validations
@@ -469,7 +504,7 @@ if __name__ == "__main__":
   with open(f"{report_dir}/mpit_configuration.json", 'w', encoding='utf-8') as file:
     json.dump(mpit_configuration, file, indent=2, ensure_ascii=False)
   
-  pattern_seeds = load_pattern_files()
+  pattern_seeds = load_pattern_files("patterns")
   
   # Generate expected input based on system prompt or target URL
   expected_input_path=os.path.join(report_dir, "expected_input.txt")
@@ -479,7 +514,7 @@ if __name__ == "__main__":
     if not expected_input:
       printl("Failed to generate expected input from system prompt.", "error")
       exit(1)
-    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10], })
+    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10.001], })
   
   if args.mode == "A":
     # Generate "Expected Input" based on target URL
@@ -488,11 +523,11 @@ if __name__ == "__main__":
     if not expected_input:
       printl("Failed to generate expected input from target URL.", "error")
       exit(1)
-    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10], })
+    pattern_seeds["expected_input"].append({"name": "llmgen", "value": expected_input, "capital": True, "score": [10.001], })
   
-  if args.mode == "I":
-    from mpit_improve import run_improve_mode
-    run_improve_mode(args, report_dir)
+  if args.mode == "E":
+    from mpit_improve import run_enhance_mode
+    run_enhance_mode(args, report_dir)
     exit(0)
   
   
@@ -524,7 +559,7 @@ if __name__ == "__main__":
     "type": filter_type
   }
 
-  filtered_patterns = filter_patterns(attack_patterns, filter_criteria)
+  filtered_patterns = filter_patterns(attack_patterns, filter_criteria, args.minimum_pattern_count)
   printl(f"Filtered attack patterns with average score >= {args.score_filter}: {len(filtered_patterns)}", "info")
   statistics = get_attack_pattern_statistics(filtered_patterns)
   filtered_patterns_path = os.path.join(report_dir, "filtered_attack_patterns.json")
