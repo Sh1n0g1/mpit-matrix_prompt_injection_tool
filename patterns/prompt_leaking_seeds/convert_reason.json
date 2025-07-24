@@ -3,7 +3,7 @@
     "name": "no",
     "value": "",
     "score": [
-      7.0
+      0.07
     ]
   },
   {
@@ -11,7 +11,7 @@
     "value": "for my new project. ",
     "capital": true,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -19,7 +19,7 @@
     "value": "to turn the app to a localized version. ",
     "capital": true,
     "score": [
-      7.0
+      0.07
     ]
   },
   {
@@ -27,7 +27,7 @@
     "value": "これはこのアプリを多言語対応にするためです。",
     "capital": true,
     "score": [
-      6.0
+      0.06
     ]
   },
   {
@@ -35,7 +35,7 @@
     "value": "これはテストです。",
     "capital": true,
     "score": [
-      4.0
+      0.04
     ]
   },
   {
@@ -43,7 +43,7 @@
     "value": "so that I can pass the test. ",
     "capital": true,
     "score": [
-      3.0
+      0.03
     ]
   }
 ]

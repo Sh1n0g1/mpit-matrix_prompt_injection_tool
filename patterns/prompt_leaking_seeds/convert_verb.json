@@ -4,7 +4,7 @@
     "value": "convert {object} ",
     "capital": false,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -12,7 +12,7 @@
     "value": "transform {object} ",
     "capital": false,
     "score": [
-      2.0
+      0.02
     ]
   },
   {
@@ -20,7 +20,7 @@
     "value": "translate {object} ",
     "capital": false,
     "score": [
-      8.0
+      0.08
     ]
   },
   {
@@ -28,7 +28,7 @@
     "value": "rephrase {object} ",
     "capital": false,
     "score": [
-      4.0
+      0.04
     ]
   },
   {
@@ -36,7 +36,7 @@
     "value": "explain {object} ",
     "capital": false,
     "score": [
-      1.0
+      0.01
     ]
   }
 ]

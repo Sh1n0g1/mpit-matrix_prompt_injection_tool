@@ -4,7 +4,7 @@
     "value": "above",
     "capital": false,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -12,7 +12,7 @@
     "value": "listed above",
     "capital": false,
     "score": [
-      5.0
+      0.05
     ]
   },
   {
@@ -20,7 +20,7 @@
     "value": "that has been covered so far",
     "capital": false,
     "score": [
-      5.0
+      0.05
     ]
   },
   {
@@ -28,7 +28,7 @@
     "value": "I've given you earlier",
     "capital": false,
     "score": [
-      4.0
+      0.04
     ]
   },
   {
@@ -36,7 +36,7 @@
     "value": "mentioned earlier",
     "capital": false,
     "score": [
-      3.0
+      0.03
     ]
   },
   {
@@ -44,7 +44,7 @@
     "value": "made earlier",
     "capital": false,
     "score": [
-      1.0
+      0.01
     ]
   },
   {
@@ -52,7 +52,7 @@
     "value": "前に言った",
     "capital": true,
     "score": [
-      4.0
+      0.04
     ]
   }
 ]

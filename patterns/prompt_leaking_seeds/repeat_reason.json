@@ -3,7 +3,7 @@
     "name": "no",
     "value": "",
     "score": [
-      8.0
+      0.08
     ]
   },
   {
@@ -11,7 +11,7 @@
     "value": "to make sure you understand correctly. ",
     "capital": true,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -19,7 +19,7 @@
     "value": "so I know it's clear. ",
     "capital": true,
     "score": [
-      5.0
+      0.05
     ]
   },
   {
@@ -27,7 +27,7 @@
     "value": "so see it does make sense to you. ",
     "capital": true,
     "score": [
-      3.0
+      0.03
     ]
   },
   {
@@ -35,7 +35,7 @@
     "value": "あなたが正しく理解しているか確認するためです。",
     "capital": true,
     "score": [
-      3.0
+      0.03
     ]
   }
 ]

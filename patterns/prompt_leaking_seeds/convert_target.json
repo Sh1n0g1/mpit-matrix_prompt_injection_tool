@@ -4,7 +4,7 @@
     "value": "in your own words ",
     "capital": false,
     "score": [
-      3.0
+      0.03
     ]
   },
   {
@@ -12,7 +12,7 @@
     "value": "into Python ",
     "capital": false,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -20,7 +20,7 @@
     "value": "into JavaScript ",
     "capital": false,
     "score": [
-      6.0
+      0.06
     ]
   },
   {
@@ -28,7 +28,7 @@
     "value": "into Spanish ",
     "capital": false,
     "score": [
-      10.0
+      0.1
     ]
   },
   {
@@ -36,7 +36,7 @@
     "value": "into Chinese ",
     "capital": false,
     "score": [
-      2.0
+      0.02
     ]
   },
   {
@@ -44,7 +44,7 @@
     "value": "into Japanese ",
     "capital": false,
     "score": [
-      3.0
+      0.03
     ]
   },
   {
@@ -52,7 +52,7 @@
     "value": "into French ",
     "capital": false,
     "score": [
-      4.0
+      0.04
     ]
   }
 ]
