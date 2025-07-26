@@ -256,6 +256,9 @@ def run_enhance_mode(args, report_dir):
     if args.overgeneration_ratio <= 0.0:
         printl("Overgeneration ratio must be greater than 0.", "error")
         sys.exit(1)
+    if not args.prompt_leaking_keywords:
+        printl("Prompt leaking keywords must not be empty.", "error")
+        sys.exit(1)
 
     derivation_ratio = args.derivation_ratio
     score_ma_window = args.score_moving_average_window
@@ -445,24 +448,24 @@ def run_enhance_mode(args, report_dir):
     with open(mpit_results_dump_path, "w", encoding="utf-8") as f:
         json.dump(mpit_results, f, indent=2, ensure_ascii=False)
 
-    # 6. Detect prompt leaking by response length, as in S mode
-    from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
+    # # 6. Detect prompt leaking by response length, as in S mode
+    # from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
 
-    printl("Detecting prompt leaking by length...", "info")
-    split_threshold = 0
-    with Progress(
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(),
-        TextColumn("Processed: [cyan]{task.completed}/{task.total}"),
-        TimeRemainingColumn(),
-    ) as progress:
-        task = progress.add_task("[green]Detecting prompt leaking...", total=len(mpit_results))
-        for result in mpit_results:
-            if result["type"] == "prompt_leaking" and not result["attack_success"]:
-                is_leaking, split_threshold = detect_prompt_leaking_by_length(mpit_results, result["responses"], split_threshold)
-                if is_leaking:
-                    result["attack_success"] = True
-            progress.advance(task)
+    # printl("Detecting prompt leaking by length...", "info")
+    # split_threshold = 0
+    # with Progress(
+    #     TextColumn("[progress.description]{task.description}"),
+    #     BarColumn(),
+    #     TextColumn("Processed: [cyan]{task.completed}/{task.total}"),
+    #     TimeRemainingColumn(),
+    # ) as progress:
+    #     task = progress.add_task("[green]Detecting prompt leaking...", total=len(mpit_results))
+    #     for result in mpit_results:
+    #         if result["type"] == "prompt_leaking" and not result["attack_success"]:
+    #             is_leaking, split_threshold = detect_prompt_leaking_by_length(mpit_results, result["responses"], split_threshold)
+    #             if is_leaking:
+    #                 result["attack_success"] = True
+    #         progress.advance(task)
 
 
     # 7. Evaluate and enhance seeds
@@ -854,10 +857,26 @@ def combine_patterns_minimal(
     excluded = set(x.strip() for x in (excluded_types or []) if x.strip())
     disabled = disabled_map or {}
 
-    def best_seed(seeds):
+    def best_seed(seeds, score_ma_window=3):
+        """
+        Returns the median-survivor seed based on moving average score,
+        unless the median's score is <5.0, in which case returns the max seed.
+        If the pool is empty, returns None.
+        """
         if not seeds:
             return None
-        return max(seeds, key=lambda s: moving_average_of_scores(s["score"], score_ma_window))
+        scored = [(s, moving_average_of_scores(s["score"], score_ma_window)) for s in seeds]
+        scored.sort(key=lambda x: x[1])  # sort by score ascending
+
+        median_idx = len(scored) // 2
+        median_score = scored[median_idx][1]
+
+        if median_score < 5.0:
+            # If the median is too weak, use the strongest survivor
+            return max(scored, key=lambda x: x[1])[0]
+        else:
+            return scored[median_idx][0]
+
 
     patterns = []
     seen = set()
@@ -906,16 +925,16 @@ def combine_patterns_minimal(
                 d["object_second_part"]["value"].capitalize() if d["object_first_part"]["capital"] else d["object_second_part"]["value"]
             )
             val = expected_input["value"].capitalize()
-            val += delimiter["value"]
+            val += " " + delimiter["value"]
             if delimiter["value"] == "":
                 val += exploit["value"].capitalize() if expected_input["capital"] else exploit["value"]
             else:
-                val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
-            val += d["convert_verb"]["value"].replace("{object}", obj_val)
-            val += d["convert_target"]["value"]
-            val += d["convert_reason"]["value"]
+                val += " " + exploit["value"].capitalize() if delimiter["capital"] else " " + exploit["value"]
+            val += " " + d["convert_verb"]["value"].replace("{object}", obj_val)
+            val += " " + d["convert_target"]["value"]
+            val += " " + d["convert_reason"]["value"]
             if "closing" in delimiter:
-                val += delimiter["closing"]
+                val += " " + delimiter["closing"]
             return val
 
         # ---- Generate base pattern (all best seeds) ----
@@ -1012,19 +1031,19 @@ def combine_patterns_minimal(
                     *[moving_average_of_scores(d[k]["score"], score_ma_window) for k in repeat_keys]
             ]
         def pl_repeat_value(d, delimiter, exploit):
-            obj_val = d["object_first_part"]["value"] + (
+            obj_val = d["object_first_part"]["value"] + " " + (
                 d["object_second_part"]["value"].capitalize() if d["object_first_part"]["capital"] else d["object_second_part"]["value"]
             )
             val = expected_input["value"].capitalize()
-            val += delimiter["value"]
+            val += " " + delimiter["value"]
             if delimiter["value"] == "":
                 val += exploit["value"].capitalize() if expected_input["capital"] else exploit["value"]
             else:
-                val += exploit["value"].capitalize() if delimiter["capital"] else exploit["value"]
-            val += d["repeat_verb"]["value"].replace("{object}", obj_val)
-            val += d["repeat_reason"]["value"]
+                val += " " + exploit["value"].capitalize() if delimiter["capital"] else " " + exploit["value"]
+            val += " " + d["repeat_verb"]["value"].replace("{object}", obj_val)
+            val += " " + d["repeat_reason"]["value"]
             if "closing" in delimiter:
-                val += delimiter["closing"]
+                val += " " + delimiter["closing"]
             return val
 
         base_delim = delimiter_best
@@ -1129,29 +1148,30 @@ def combine_patterns_minimal(
             if c["expected_input"]:
                 s += c["expected_input"]["value"].capitalize()
             if c["delimiter"]:
-                s += c["delimiter"]["value"]
+                s += " " + c["delimiter"]["value"]
             if c["exploit"]:
                 if c["delimiter"]["value"] == "":
                     s += (c["exploit"]["value"].capitalize() if c["expected_input"]["capital"]
                           else c["exploit"]["value"])
                 else:
-                    s += (c["exploit"]["value"].capitalize() if c["delimiter"]["capital"]
+                    s += " " + (c["exploit"]["value"].capitalize() if c["delimiter"]["capital"]
                           else c["exploit"]["value"])
             if c[ni] and c["exploit"]:
                 if c["exploit"] == "":
                     if c["delimiter"] == "":
-                        s += (c[ni]["value"].capitalize() if c["expected_input"]["capital"]
+                        s += " " + (c[ni]["value"].capitalize() if c["expected_input"]["capital"]
                               else c[ni]["value"])
                     else:
-                        s += (c[ni]["value"].capitalize() if c["delimiter"]["capital"]
+                        s += " " + (c[ni]["value"].capitalize() if c["delimiter"]["capital"]
                               else c[ni]["value"])
-                s += (c[ni]["value"].capitalize() if c["exploit"]["capital"]
+                else:
+                    s += " " + (c[ni]["value"].capitalize() if c["exploit"]["capital"]
                       else c[ni]["value"])
             if c[ni] and c["reason"]:
-                s += (c["reason"]["value"].capitalize() if c[ni]["capital"]
+                s += " " + (c["reason"]["value"].capitalize() if c[ni]["capital"]
                       else c["reason"]["value"])
             if c["delimiter"] and "closing" in c["delimiter"]:
-                s += c["delimiter"]["closing"]
+                s += " " + c["delimiter"]["closing"]
             return s
 
         def make_seed_names(c, ni_type):
@@ -1159,7 +1179,7 @@ def combine_patterns_minimal(
                 "expected_input": c["expected_input"]["name"],
                 "delimiter": c["delimiter"]["name"],
                 "exploit": c["exploit"]["name"],
-                ni_type: c[ni]["name"],
+                ni_type: c[ni_type]["name"],
                 "reason": c["reason"]["name"]
             }
 
