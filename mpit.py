@@ -366,6 +366,7 @@ def parse_args():
       A Mode (Attack):   python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/ 
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
+      E Mode (Enhance):  python mpit.py E --system-prompt-file samples\bella_generic_ai_assistant\system_prompt.txt 
     """,
     formatter_class=argparse.RawTextHelpFormatter
   )
@@ -527,9 +528,10 @@ if __name__ == "__main__":
   
   if args.mode == "E":
     from mpit_enhance import run_enhance_mode
+    args.no_sqli = True
+    args.no_rce = True
     run_enhance_mode(args, report_dir)
     exit(0)
-  
   
   attack_patterns = combine_patterns(pattern_seeds)
   printl(f"Total attack patterns generated: {len(attack_patterns)}", "info")
