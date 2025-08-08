@@ -8,6 +8,7 @@ It has 3 operational modes.
 - **[G]enerate**: Create prompt injection payloads.
 - **[A]ttack**: Automatically launch real-world prompt injection attacks against a live LLM-backed application.
 - **[S]imulate**: Simulate an LLM system locally with a specified system prompt to generated attacks without making external requests.
+- **[E]nhance**: Enhance the attack pattern using genetic algorithm.
 
 ### Key Features
 - Supports multiple attack types: RCE, SQLi, XSS, MDI(Markdown Injection), Prompt Leaking, and Out-of-Scope Requests (OSR).
