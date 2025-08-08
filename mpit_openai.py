@@ -30,15 +30,15 @@ def get_openai_responses(
     llm_outputs=[]
     for choice in completion.choices:
       if choice.finish_reason != "stop":
-        printl(f"Warning: Model did not finish cleanly. Finish reason: {choice.finish_reason}", level="warning")
+        printl(f"Warning: Model did not finish cleanly. Finish reason: {choice.finish_reason}", "warning")
       else:
         llm_outputs.append(choice.message.content.strip())
     if not completion.choices or len(completion.choices) == 0:
-      printl("Error: No choices returned from OpenAI API.", level="error")
+      printl("Error: No choices returned from OpenAI API.", "error")
       return []
     return llm_outputs
   except Exception as e:
-    printl(f"Error communicating with OpenAI API: {e}", level="error")
+    printl(f"Error communicating with OpenAI API: {e}", "error")
     return []
 
 # Example usage

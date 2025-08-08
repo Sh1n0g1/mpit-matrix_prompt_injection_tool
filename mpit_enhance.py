@@ -1337,33 +1337,33 @@ def combine_prompt_leaking_seeds(seed_dir):
             progress.advance(task)
 
 
-    def get_highest_patterns_dir(base_path="."):
-        pattern = re.compile(r"^patterns_(\d+)$")
-        max_n = 0
+    # def get_highest_patterns_dir(base_path="."):
+    #     pattern = re.compile(r"^patterns_(\d+)$")
+    #     max_n = 0
 
-        for name in os.listdir(base_path):
-            match = pattern.match(name)
-            if match:
-                n = int(match.group(1))
-                if n > max_n:
-                    max_n = n
-        return max_n
+    #     for name in os.listdir(base_path):
+    #         match = pattern.match(name)
+    #         if match:
+    #             n = int(match.group(1))
+    #             if n > max_n:
+    #                 max_n = n
+    #     return max_n
 
-    def duplicate_patterns_dir(base_path="."):
-        # Step 1: Find the highest existing "patterns_n"
-        max_n = get_highest_patterns_dir(base_path)
-        new_n = max_n + 1
-        src = os.path.join(base_path, "patterns")
-        dst = os.path.join(base_path, f"patterns_{new_n}")
+    # def duplicate_patterns_dir(base_path="."):
+    #     # Step 1: Find the highest existing "patterns_n"
+    #     max_n = get_highest_patterns_dir(base_path)
+    #     new_n = max_n + 1
+    #     src = os.path.join(base_path, "patterns")
+    #     dst = os.path.join(base_path, f"patterns_{new_n}")
 
-        # Step 2: Duplicate the directory
-        if not os.path.exists(src):
-            raise FileNotFoundError(f"Source directory '{src}' does not exist.")
-        shutil.copytree(src, dst)
-        print(f"Duplicated '{src}' to '{dst}'")
+    #     # Step 2: Duplicate the directory
+    #     if not os.path.exists(src):
+    #         raise FileNotFoundError(f"Source directory '{src}' does not exist.")
+    #     shutil.copytree(src, dst)
+    #     print(f"Duplicated '{src}' to '{dst}'")
 
-    # Run it
-    duplicate_patterns_dir()
+    # # Run it
+    # duplicate_patterns_dir()
 
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as file:
         json.dump(prompt_leaking_patterns, file, indent=2, ensure_ascii=False)
