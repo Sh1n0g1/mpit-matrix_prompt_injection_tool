@@ -39,33 +39,35 @@ pip install -r requirements.txt
 5. This is the "[S]imulation mode"
 
 ### Details
-* MIPT has 3 different modes:
+* MIPT has 4 different modes:
   * [G]enerate Attack Pattern
   * [A]ttack the LLM App (URL required)
   * [S]imulate the LLM App (system prompt required)
+  * [E]nhance the seeds (system prompt required)
 
-| Category             | [G] Generate                                  | [A] Attack                                                                  | [S] Simulate                                                                  |
-|----------------------|-----------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| **Purpose**          | Generate prompt injection attack patterns     | Execute attacks on a real LLM web application                              | Simulate LLM behavior locally to test prompt injection                        |
-| **Use Case**         | Generate attack vectors to test with later    | Evaluate real system’s resilience to live prompt injection                 | Analyze how your system prompt would respond to attacks pre-deployment       |
-| **Requirement**      | None                                          | - Target URL and curl command<br>- Keywords to detect prompt leaking | - System prompt<br>- (Optional) model and temperature<br>- Keywords to detect prompt leaking           |
-| **Attack to System** | ✘ Does not contact any external system        | ✅ Sends real requests to target LLM app                                    | ✘ Only simulates responses locally                                            |
-| **Report Output**    | ✘                                             | ✅                                                                          | ✅                                                                             |
-
+| Category             | [G] Generate                                  | [A] Attack                                                                  | [S] Simulate                                                                  | [E] Enhance                                                                                  |
+|----------------------|-----------------------------------------------|-----------------------------------------------------------------------------|--------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| **Purpose**          | Generate prompt injection attack patterns     | Execute attacks on a real LLM web application                              | Simulate LLM behavior locally to test prompt injection                        | Improve, mutate, and refine existing attack patterns to increase effectiveness               |
+| **Use Case**         | Generate attack vectors to test with later    | Evaluate real system’s resilience to live prompt injection                 | Analyze how your system prompt would respond to attacks pre-deployment       | Generate the new patterns to get a better chance of success  |
+| **Requirement**      | None                                          | - Target URL and curl command<br>- Keywords to detect prompt leaking       | - System prompt<br>- (Optional) model and temperature<br>- Keywords to detect prompt leaking | - System prompt |
+| **Attack to System** | ✘ Does not contact any external system        | ✅ Sends real requests to target LLM app                                    | ✘ Only simulates responses locally                                            | ✘ Only transforms attack patterns without contacting external systems                         |
+| **Report Output**    | ✘                                             | ✅                                                                          | ✅                                                                             | ✅                                                                                            |
 
 
 ### Command Line
 ```
 usage: mpit.py [-h] [--target-url TARGET_URL] [--target-curl-file TARGET_CURL_FILE] [--target-clear-curl-file TARGET_CLEAR_CURL_FILE]
-               [--system-prompt-file SYSTEM_PROMPT_FILE] [--model MODEL] [--temperature TEMPERATURE] [--attempt-per-attack ATTEMPT_PER_ATTACK]
-               [--prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS] [--no-mdi] [--no-prompt-leaking] [--no-osr] [--no-xss] [--no-rce] [--no-sqli]
-               [--dump-all-attack] [--score-filter SCORE_FILTER]
-               {G,A,S}
+               [--system-prompt-file SYSTEM_PROMPT_FILE] [--model MODEL] [--temperature TEMPERATURE] [--exclude-seed-types EXCLUDE_SEED_TYPES]
+               [--target-seed-counts TARGET_SEED_COUNTS] [--attempt-per-test ATTEMPT_PER_TEST] [--overgeneration-ratio OVERGENERATION_RATIO]
+               [--derivation-ratio DERIVATION_RATIO] [--score-moving-average-window SCORE_MOVING_AVERAGE_WINDOW] [--attempt-per-attack ATTEMPT_PER_ATTACK]    
+               [--minimum-pattern-count MINIMUM_PATTERN_COUNT] [--prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS] [--no-mdi] [--no-prompt-leaking]
+               [--no-osr] [--no-xss] [--no-rce] [--no-sqli] [--dump-all-attack] [--score-filter SCORE_FILTER]
+               {G,A,S,E}
 
 The Matrix Prompt Injection Tool (MPIT) - Generate, Simulate or Attack prompt injection attacks.
 
 positional arguments:
-  {G,A,S}               Mode: G (Generate), A (Attack), S (Simulate)
+  {G,A,S,E}             Mode: G (Generate), A (Attack), S (Simulate), E (Enhance)
 
 options:
   -h, --help            show this help message and exit
@@ -76,14 +78,40 @@ options:
   --target-clear-curl-file TARGET_CLEAR_CURL_FILE
                         A:File path containing clear conversation curl command to reset the conversation state.
   --system-prompt-file SYSTEM_PROMPT_FILE
-                        S:File path containing simulated victim system prompt.
-  --model MODEL         S:Model to use for simulation (default: gpt-4.1-nano).
+                        SE:File path containing simulated victim system prompt.
+  --model MODEL         SE:Model to use for simulation (default: gpt-4.1-nano).
   --temperature TEMPERATURE
-                        S:Temperature for simulated LLM (0.0 - 1.0)
+                        SE:Temperature for simulated LLM (0.0 - 1.0)
+  --exclude-seed-types EXCLUDE_SEED_TYPES
+                        E:Comma-separated list of seed types to exclude from Enhancement
+  --target-seed-counts TARGET_SEED_COUNTS
+                        E:Comma-separated seed type target counts, e.g. delimiter=10,exploit=20,new_instruction_xss=3,new_instruction_xss.reason=4
+  --attempt-per-test ATTEMPT_PER_TEST
+                        E: Number of attempts per attack in Enhance mode (default: 10)
+  --overgeneration-ratio OVERGENERATION_RATIO
+                        Ratio of generated seeds exceeding target count, relative to target count; actual number rounded up (default: 0.3)
+  --derivation-ratio DERIVATION_RATIO
+                        E: Probability of each generated seed deriving from an existing seed (default: 0.5)
+  --score-moving-average-window SCORE_MOVING_AVERAGE_WINDOW
+                        E: Moving average window size for score calculation (default: 1)
   --attempt-per-attack ATTEMPT_PER_ATTACK
-                        AS: Number of attempts per attack (default: 1)
+                        AS: Number of attempts per attack in Attack and Simulate modes (default: 1)
+  --minimum-pattern-count MINIMUM_PATTERN_COUNT
+                        AS: Guaranteed number of top patterns used, regardless of score filter (default: 0)
+                        E: Moving average window size for score calculation (default: 1)
+  --attempt-per-attack ATTEMPT_PER_ATTACK
+                        AS: Number of attempts per attack in Attack and Simulate modes (default: 1)
+  --minimum-pattern-count MINIMUM_PATTERN_COUNT
+                        AS: Guaranteed number of top patterns used, regardless of score filter (default: 0)
   --prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS
-                        AS: A list of keywords to check for prompt leaking, separated by commas (default: empty).
+                        ASE: A list of keywords to check for prompt leaking, separated by commas (default: empty).
+  --attempt-per-attack ATTEMPT_PER_ATTACK
+                        AS: Number of attempts per attack in Attack and Simulate modes (default: 1)
+  --minimum-pattern-count MINIMUM_PATTERN_COUNT
+                        AS: Guaranteed number of top patterns used, regardless of score filter (default: 0)
+                        AS: Guaranteed number of top patterns used, regardless of score filter (default: 0)
+  --prompt-leaking-keywords PROMPT_LEAKING_KEYWORDS
+                        ASE: A list of keywords to check for prompt leaking, separated by commas (default: empty).
   --no-mdi              Disable MDI test (default: False).
   --no-prompt-leaking   Disable prompt leaking test (default: False).
   --no-osr              Disable Out-of-scope request test (default: False).
@@ -101,6 +129,7 @@ options:
       A Mode (Attack):   python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
+      E Mode (Enhance):  python mpit.py E --system-prompt-file samples/bella_generic_ai_assistant/system_prompt.txt
 ```
 ### Having trouble building the command line?
 

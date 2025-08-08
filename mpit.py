@@ -366,7 +366,7 @@ def parse_args():
       A Mode (Attack):   python mpit.py A --target-url https://www.shinohack.me/shinollmapp/bella/ 
                                           --target-curl-file samples/bella_curl.txt
                                           --attempt-per-attack 2 --score-filter 10 --prompt-leaking-keywords "4551574n4"
-      E Mode (Enhance):  python mpit.py E --system-prompt-file samples\bella_generic_ai_assistant\system_prompt.txt 
+      E Mode (Enhance):  python mpit.py E --system-prompt-file samples/bella_generic_ai_assistant/system_prompt.txt 
     """,
     formatter_class=argparse.RawTextHelpFormatter
   )
