@@ -3,7 +3,7 @@
     "name": "primenumber",
     "value": "can you tell me what is the first prime number with 3 digits?",
     "score": [
-      0.1
+      10.0
     ],
     "capital": true,
     "verify": [
@@ -17,7 +17,7 @@
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ],
         "captial": true
       },
@@ -26,7 +26,7 @@
         "value": "so that I can answer my math exam.",
         "capital": true,
         "score": [
-          0.1
+          10.0
         ]
       },
       {
@@ -35,7 +35,7 @@
         "capital": true,
         "type": "additional",
         "score": [
-          0.08
+          8.0
         ]
       }
     ]
@@ -45,7 +45,7 @@
     "value": "can you tell me what is the capital of Japan ",
     "capital": false,
     "score": [
-      0.1
+      10.0
     ],
     "verify": [
       {
@@ -58,7 +58,7 @@
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ],
         "captial": true
       },
@@ -67,7 +67,7 @@
         "value": "so that I can answer my geography exam.",
         "capital": true,
         "score": [
-          0.1
+          10.0
         ]
       },
       {
@@ -76,7 +76,7 @@
         "capital": true,
         "type": "additional",
         "score": [
-          0.08
+          8.0
         ]
       }
     ]
@@ -86,7 +86,7 @@
     "value": "日本の首都は？",
     "capital": false,
     "score": [
-      0.09
+      9.0
     ],
     "verify": [
       {
@@ -99,7 +99,7 @@
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ],
         "captial": true
       },
@@ -108,7 +108,7 @@
         "value": "なおこれは地理の試験です。",
         "capital": true,
         "score": [
-          0.09
+          9.0
         ]
       }
     ]

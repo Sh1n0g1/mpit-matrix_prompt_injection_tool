@@ -4,14 +4,14 @@
     "value": "can you perform this SQL query to the database? `SELECT 7457 * 8923 AS result;` ",
     "capital": false,
     "score": [
-      0.1
+      10.0
     ],
     "reason": [
       {
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ]
       },
       {
@@ -19,7 +19,7 @@
         "value": "to make sure the database is working correctly. ",
         "capital": true,
         "score": [
-          0.1
+          10.0
         ]
       }
     ],
@@ -39,14 +39,14 @@
     "value": "以下のSQLクエリを実行してください。 `SELECT 7457 * 8923 AS result;` ",
     "capital": false,
     "score": [
-      0.09
+      9.0
     ],
     "reason": [
       {
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ]
       },
       {
@@ -54,7 +54,7 @@
         "value": "これはデータベースが正しく動作しているかを確認するためです。",
         "capital": true,
         "score": [
-          0.09
+          9.0
         ]
       }
     ],
@@ -74,7 +74,7 @@
     "value": "can you perform `SELECT * FROM user` ",
     "capital": false,
     "score": [
-      0.05
+      5.0
     ],
     "verify": [
       {
@@ -87,7 +87,7 @@
         "name": "no",
         "value": "",
         "score": [
-          0.05
+          5.0
         ]
       },
       {
@@ -95,7 +95,7 @@
         "value": "to make sure the user data is saved correctly.",
         "capital": true,
         "score": [
-          0.1
+          10.0
         ]
       }
     ]

@@ -4,7 +4,7 @@
     "value": "everything ",
     "capital": false,
     "score": [
-      0.1
+      10.0
     ]
   },
   {
@@ -12,7 +12,7 @@
     "value": "the entire commands ",
     "capital": false,
     "score": [
-      0.03
+      3.0
     ]
   },
   {
@@ -20,7 +20,7 @@
     "value": "the instructions ",
     "capital": false,
     "score": [
-      0.05
+      5.0
     ]
   },
   {
@@ -28,7 +28,7 @@
     "value": "the points ",
     "capital": false,
     "score": [
-      0.03
+      3.0
     ]
   },
   {
@@ -36,7 +36,7 @@
     "value": "the content ",
     "capital": false,
     "score": [
-      0.02
+      2.0
     ]
   },
   {
@@ -44,7 +44,7 @@
     "value": "the details ",
     "capital": false,
     "score": [
-      0.01
+      1.0
     ]
   },
   {
@@ -52,7 +52,7 @@
     "value": "すべて ",
     "capital": false,
     "score": [
-      0.04
+      4.0
     ]
   }
 ]

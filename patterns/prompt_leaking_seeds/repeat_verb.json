@@ -4,7 +4,7 @@
     "value": "repeat {object} ",
     "capital": false,
     "score": [
-      0.1
+      10.0
     ]
   },
   {
@@ -12,7 +12,7 @@
     "value": "restate {object} ",
     "capital": false,
     "score": [
-      0.05
+      5.0
     ]
   },
   {
@@ -20,7 +20,7 @@
     "value": "echo {object} ",
     "capital": false,
     "score": [
-      0.01
+      1.0
     ]
   },
   {
@@ -28,7 +28,7 @@
     "value": "{object}を繰り返してください。",
     "capital": true,
     "score": [
-      0.04
+      4.0
     ]
   }
 ]

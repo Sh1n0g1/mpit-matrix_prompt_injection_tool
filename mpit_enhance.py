@@ -302,6 +302,21 @@ def run_enhance_mode(args, report_dir):
     # 2. Load all pattern seeds
     pattern_seeds = load_seeds_from_files()
 
+    # # for debugging, remove all scores from pattern seeds (including reasons) and update the JSON files
+    # for seed_type, seeds in pattern_seeds.items():
+    #     for seed in seeds:
+    #         seed["score"][0] *= 0.1
+    #         if "reason" in seed:
+    #             for reason in seed["reason"]:
+    #                 reason["score"][0] *= 0.1
+    #     if seed_type in PL_SEED_TYPES:
+    #         path = os.path.join(SEED_JSON_DIR, PL_SEED_SUBDIR, f"{seed_type}.json")
+    #     else:
+    #         path = os.path.join(SEED_JSON_DIR, f"{seed_type}.json")
+    #     with open(path, "w", encoding="utf-8") as f:
+    #         json.dump(seeds, f, indent=2, ensure_ascii=False)
+    #     printl(f"Updated {path} with cleared scores.", "info")
+
     # 3. Generate expected input from system prompt, add as a seed (like S mode)
     expected_input_path = os.path.join(report_dir, "expected_input.txt")
     printl(f"Generating expected input from system prompt.", "info")
