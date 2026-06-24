@@ -1,6 +1,11 @@
 # MPIT - Matrix Prompt Injection Tool
 ![MPIT Logo](images/mpit_logo.png)
 
+## DEFCON 33 Demo Labs
+<a href="https://www.youtube.com/embed/6idT7hsb7QE" target="_blank"><img width="1058" height="587" alt="image" src="https://github.com/user-attachments/assets/e82d294d-b43b-4527-bf7a-8b00e83a219a" /></a>
+
+Find the Slides [here](MPIT_DEFCON33_Slides.pdf)
+
 ## Abstract
 MPIT is a prompt injection testing tool for LLM pentest.
 It has 3 operational modes.
